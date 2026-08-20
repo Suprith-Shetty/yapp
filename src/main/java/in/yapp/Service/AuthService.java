@@ -1,5 +1,6 @@
 package in.yapp.Service;
 
+import in.yapp.DTO.LoginRequestDTO;
 import in.yapp.DTO.UserRegisterRequestDTO;
 import in.yapp.DTO.UserRegisterResponseDTO;
 import in.yapp.Entity.Role;
@@ -8,6 +9,9 @@ import in.yapp.Exceptions.AppException;
 import in.yapp.Exceptions.ErrorCode;
 import in.yapp.Repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -20,8 +24,9 @@ public class AuthService {
 
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
+    private final AuthenticationManager authenticationManager;
 
-
+    //User registeration...
     public UserRegisterResponseDTO register(UserRegisterRequestDTO userRegisterRequestDTO)
     {
         // Check for existing username and email before creating the user
@@ -71,7 +76,31 @@ public class AuthService {
 
         return response;
 
-
-
     }
+
+
+    //User Login
+    public void login(LoginRequestDTO request)
+    {
+        UsernamePasswordAuthenticationToken authenticationToken =
+                new UsernamePasswordAuthenticationToken(
+                        request.getIdentifier(),
+                        request.getPassword()
+                );
+
+        authenticationManager.authenticate(authenticationToken);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
