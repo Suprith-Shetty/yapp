@@ -2,6 +2,7 @@ package in.yapp.Controller;
 
 
 import in.yapp.DTO.LoginRequestDTO;
+import in.yapp.DTO.LoginResponseDTO;
 import in.yapp.DTO.UserRegisterRequestDTO;
 import in.yapp.DTO.UserRegisterResponseDTO;
 import in.yapp.Service.AuthService;
@@ -25,11 +26,10 @@ public class AuthController
 
 
     @PostMapping("/login")
-    public  ResponseEntity<?>  login(@Valid @RequestBody LoginRequestDTO loginRequestDTO)
+    public  ResponseEntity<LoginResponseDTO>  login(@Valid @RequestBody LoginRequestDTO loginRequestDTO)
     {
-        authService.login(loginRequestDTO);
 
-        return ResponseEntity.ok("user logged-in successfully");
+        return ResponseEntity.ok(authService.login(loginRequestDTO));
     }
 
 

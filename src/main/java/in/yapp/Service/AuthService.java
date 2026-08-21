@@ -1,6 +1,7 @@
 package in.yapp.Service;
 
 import in.yapp.DTO.LoginRequestDTO;
+import in.yapp.DTO.LoginResponseDTO;
 import in.yapp.DTO.UserRegisterRequestDTO;
 import in.yapp.DTO.UserRegisterResponseDTO;
 import in.yapp.Entity.Role;
@@ -8,10 +9,12 @@ import in.yapp.Entity.User;
 import in.yapp.Exceptions.AppException;
 import in.yapp.Exceptions.ErrorCode;
 import in.yapp.Repository.UserRepository;
+import in.yapp.Security.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +28,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
     private final AuthenticationManager authenticationManager;
+    private final JwtService jwtService;
 
     //User registeration...
     public UserRegisterResponseDTO register(UserRegisterRequestDTO userRegisterRequestDTO)
@@ -80,7 +84,7 @@ public class AuthService {
 
 
     //User Login
-    public void login(LoginRequestDTO request)
+    public LoginResponseDTO login(LoginRequestDTO request)
     {
         UsernamePasswordAuthenticationToken authenticationToken =
                 new UsernamePasswordAuthenticationToken(
@@ -88,7 +92,15 @@ public class AuthService {
                         request.getPassword()
                 );
 
-        authenticationManager.authenticate(authenticationToken);
+        Authentication authentication = authenticationManager.authenticate(authenticationToken);
+
+
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+
+        return jwtService.generateToken(userDetails);
+
+
+
     }
 
 
