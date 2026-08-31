@@ -353,23 +353,54 @@ function replyPreviewText(message) {
 function Ticks({ status }) {
   if (!status) return null;
 
-  const label =
-      status === "READ"
-          ? "Seen"
-          : "Sent";
+  if (status === "SENDING") {
+    return (
+        <span className="msg-status sending" aria-label="Sending">
+        <SendingArrow />
+      </span>
+    );
+  }
+
+  const label = status === "READ" ? "Seen" : "Sent";
 
   return (
       <span
           className={`msg-status ${
-              status === "READ"
-                  ? "read"
-                  : "sent"
+              status === "READ" ? "read" : "sent"
           }`}
       >
       {label}
     </span>
   );
 }
+
+
+
+function SendingArrow() {
+  return (
+      <svg
+          width="14"
+          height="14"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          aria-hidden="true"
+      >
+        <path
+            d="M5 12h13"
+            strokeLinecap="round"
+        />
+        <path
+            d="M13 6l6 6-6 6"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+        />
+      </svg>
+  );
+}
+
+
 
 // ============================================================
 // TIME

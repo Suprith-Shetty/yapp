@@ -132,35 +132,68 @@ export default function ConversationView({
     // NEW MESSAGE
     // ----------------------------------------------------------
 
-    const offMessage = on("MESSAGE", (payload) => {
-      if (payload.conversationId !== conversationId) {
-        return;
-      }
+      const offMessage = on("MESSAGE", (payload) => {
+          if (payload.conversationId !== conversationId) {
+              return;
+          }
 
-      setMessages((prev) => {
-        if (
-            prev.some(
-                (message) =>
-                    message.messageId === payload.messageId
-            )
-        ) {
-          return prev;
-        }
+          const isOwnMessage =
+              payload.senderUserName === currentUser.username;
 
-        return [...prev, payload];
+          setMessages((prev) => {
+              // ----------------------------------------------------------
+              // SERVER ECHO OF OUR OWN OPTIMISTIC MESSAGE
+              // ----------------------------------------------------------
+              if (isOwnMessage) {
+                  const optimisticIndex = prev.findIndex(
+                      (message) =>
+                          message.optimistic &&
+                          message.senderUserName === payload.senderUserName &&
+                          message.content === payload.content &&
+                          message.messageType === payload.messageType &&
+                          String(message.replyToMessageId || "") ===
+                          String(payload.replyToMessageId || "")
+                  );
+
+                  if (optimisticIndex !== -1) {
+                      const next = [...prev];
+
+                      next[optimisticIndex] = {
+                          ...payload,
+                          status: "SENT",
+                          optimistic: false,
+                      };
+
+                      return next;
+                  }
+              }
+
+              // ----------------------------------------------------------
+              // DUPLICATE PROTECTION
+              // ----------------------------------------------------------
+              if (
+                  prev.some(
+                      (message) =>
+                          message.messageId === payload.messageId
+                  )
+              ) {
+                  return prev;
+              }
+
+              // ----------------------------------------------------------
+              // NORMAL INCOMING MESSAGE
+              // ----------------------------------------------------------
+              return [...prev, payload];
+          });
+
+          // Incoming messages are automatically marked as read
+          if (!isOwnMessage) {
+              emitMessageRead(
+                  conversationId,
+                  payload.messageId
+              );
+          }
       });
-
-      // Automatically read incoming message
-      if (
-          payload.senderUserName !==
-          currentUser.username
-      ) {
-        emitMessageRead(
-            conversationId,
-            payload.messageId
-        );
-      }
-    });
 
     // ----------------------------------------------------------
     // MESSAGE STATUS
@@ -379,20 +412,50 @@ export default function ConversationView({
   // SEND TEXT
   // ============================================================
 
-  const handleSendText = useCallback(
-      (text, replyToMessageId) => {
-        sendChatMessage({
-          conversationId,
-          content: text,
-          messageType: "TEXT",
-          replyToMessageId:
-              replyToMessageId || null,
-        });
+    const handleSendText = useCallback(
+        (text, replyToMessageId) => {
+            const tempMessageId = `temp-${Date.now()}-${Math.random()
+                .toString(36)
+                .slice(2)}`;
 
-        setReplyTo(null);
-      },
-      [conversationId]
-  );
+            const optimisticMessage = {
+                messageId: tempMessageId,
+                conversationId,
+                content: text,
+                senderUserName: currentUser.username,
+                senderUserId: currentUser.id,
+                messageType: "TEXT",
+                createdAt: new Date().toISOString(),
+                status: "SENDING",
+
+                replyToMessageId: replyToMessageId || null,
+
+                // These will be replaced by the real server message
+                // when the WebSocket MESSAGE event arrives.
+                replyToContent: null,
+                replyToSenderUserName: null,
+                replyToMessageType: null,
+                replyToFileName: null,
+
+                reactions: [],
+                optimistic: true,
+            };
+
+            // 1. SHOW IT IMMEDIATELY
+            setMessages((prev) => [...prev, optimisticMessage]);
+
+            // 2. SEND IT TO THE SERVER
+            sendChatMessage({
+                conversationId,
+                content: text,
+                messageType: "TEXT",
+                replyToMessageId: replyToMessageId || null,
+            });
+
+            setReplyTo(null);
+        },
+        [conversationId, currentUser]
+    );
 
   // ============================================================
   // FILE SENT

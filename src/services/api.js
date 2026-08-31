@@ -29,6 +29,7 @@ function friendlyFor({ status, path = "", backendMessage = "" } = {}, context) {
   if (context === "register") {
     if (msg.includes("username")) return "Username is already taken.";
     if (msg.includes("email")) return "That username is unavailable. Please try another.";
+    if (msg.includes("password")) return "Password must be at least 8 characters.";
     return "We couldn't create your account. Please try again.";
   }
   if (context === "login") {
