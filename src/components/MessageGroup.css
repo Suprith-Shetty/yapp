@@ -1,0 +1,371 @@
+.msg-group {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 5px 12px;
+  margin-bottom: 2px;
+  animation: group-in 0.15s ease;
+}
+
+.msg-group.own {
+  flex-direction: row-reverse;
+}
+
+.msg-group:hover {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+@keyframes group-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.msg-group-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex: none;
+  margin-top: 2px;
+}
+
+.msg-group-body {
+  flex: 0 1 auto;
+  min-width: 0;
+  max-width: min(72%, 620px);
+}
+
+.msg-group.own .msg-group-body {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.msg-group.received .msg-group-body {
+  align-items: flex-start;
+}
+
+.msg-group-header {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 3px;
+}
+
+.msg-group.own .msg-group-header {
+  justify-content: flex-end;
+}
+
+.msg-sender {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.msg-sender.own {
+  color: var(--accent-ink);
+}
+
+.msg-group-time {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--ink-faint);
+}
+
+.msg-line {
+  position: relative;
+  padding: 2px 0;
+  cursor: default;
+  transition: transform 0.15s ease;
+  touch-action: pan-y;
+  max-width: 100%;
+}
+
+.msg-line-content {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.msg-group.received .msg-line-content {
+  justify-content: flex-start;
+}
+
+.msg-group.own .msg-line-content {
+  justify-content: flex-end;
+}
+
+.msg-text {
+  margin: 0;
+  padding: 9px 13px;
+  border-radius: 18px;
+  font-size: 14.5px;
+  line-height: 1.45;
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-width: 100%;
+}
+
+.msg-group.received .msg-text {
+  background: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--border);
+  border-top-left-radius: 5px;
+}
+
+.msg-group.own .msg-text {
+  background: var(--gradient);
+  color: #fff;
+  border-top-right-radius: 5px;
+}
+
+.msg-edited {
+  font-size: 11px;
+  color: var(--ink-faint);
+  font-style: italic;
+}
+
+.msg-status {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--ink-faint);
+  flex: none;
+}
+
+.msg-status.read {
+  color: var(--accent-ink);
+}
+
+.msg-status.failed {
+  color: var(--danger);
+}
+
+.msg-hover-toolbar {
+  position: absolute;
+  top: -14px;
+  right: 4px;
+  display: flex;
+  gap: 2px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  padding: 2px;
+  opacity: 0;
+  transform: translateY(2px);
+  transition: opacity 0.1s ease, transform 0.1s ease;
+  z-index: 3;
+}
+
+.msg-line:hover .msg-hover-toolbar {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.hover-action {
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  border: none;
+  background: none;
+  color: var(--ink-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hover-action:hover {
+  background: var(--surface-hover);
+  color: var(--ink);
+}
+
+.msg-time-tooltip {
+  display: inline-block;
+  margin-left: 8px;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--ink-faint);
+  opacity: 0;
+  transform: translateY(2px);
+  transition: opacity 0.12s ease, transform 0.12s ease;
+  vertical-align: middle;
+  pointer-events: none;
+}
+
+.msg-time-tooltip.standalone {
+  margin-left: 0;
+}
+
+.msg-line:hover .msg-time-tooltip,
+.msg-time-tooltip.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.reply-preview {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--ink-faint);
+  margin-bottom: 3px;
+  padding-left: 4px;
+}
+
+.msg-group.own .reply-preview {
+  padding-left: 0;
+  padding-right: 4px;
+}
+
+.swipe-reply-hint {
+  position: absolute;
+  left: -32px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--accent-ink);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.reply-preview-text {
+  font-size: 12.5px;
+  color: var(--ink-faint);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 320px;
+}
+
+/* ============================================================
+   MESSAGE REACTIONS
+   ============================================================ */
+
+.msg-line {
+  position: relative;
+}
+
+.reaction-picker {
+  position: absolute;
+  right: 4px;
+  bottom: calc(100% + 6px);
+
+  display: flex;
+  align-items: center;
+  gap: 2px;
+
+  padding: 5px 7px;
+
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 22px;
+
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35);
+
+  z-index: 20;
+
+  animation: reaction-picker-in 0.12s ease;
+}
+
+.msg-group.received .reaction-picker {
+  left: 4px;
+  right: auto;
+}
+
+.reaction-option {
+  width: 34px;
+  height: 34px;
+
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+
+  background: transparent;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 19px;
+  line-height: 1;
+
+  cursor: pointer;
+
+  transition:
+          transform 0.12s ease,
+          background 0.12s ease;
+}
+
+.reaction-option:hover {
+  background: var(--surface-hover);
+  transform: scale(1.25);
+}
+
+.reaction-option:active {
+  transform: scale(1.05);
+}
+
+
+/* Reactions already attached to a message */
+
+.message-reactions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+
+  margin-top: -2px;
+  margin-bottom: 2px;
+
+  padding-left: 4px;
+}
+
+.msg-group.own .message-reactions {
+  justify-content: flex-end;
+  padding-left: 0;
+  padding-right: 4px;
+}
+
+.message-reaction {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+
+  min-width: 25px;
+  height: 24px;
+
+  padding: 2px 7px;
+
+  border-radius: 13px;
+
+  background: var(--surface);
+  border: 1px solid var(--border);
+
+  font-size: 14px;
+  line-height: 1;
+
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.reaction-count {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--ink-faint);
+}
+
+@keyframes reaction-picker-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px) scale(0.96);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}

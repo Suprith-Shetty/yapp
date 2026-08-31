@@ -1,0 +1,4995 @@
+<!--<!DOCTYPE html>-->
+<!--<html lang="en">-->
+<!--<head>-->
+<!--    <meta charset="UTF-8">-->
+<!--    <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
+<!--    <title>Yapp - Dev Chat Frontend</title>-->
+
+<!--    <script src="https://cdn.jsdelivr.net/npm/@stomp/stompjs@7/bundles/stomp.umd.min.js"></script>-->
+
+<!--    <style>-->
+<!--        * {-->
+<!--            box-sizing: border-box;-->
+<!--        }-->
+
+<!--        body {-->
+<!--            margin: 0;-->
+<!--            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",-->
+<!--            Roboto, Arial, sans-serif;-->
+<!--            background: #f2f2f2;-->
+<!--            color: #222;-->
+<!--        }-->
+
+<!--        .hidden {-->
+<!--            display: none !important;-->
+<!--        }-->
+
+<!--        button {-->
+<!--            cursor: pointer;-->
+<!--        }-->
+
+<!--        /* ================= LOGIN ================= */-->
+
+<!--        #login-screen {-->
+<!--            width: 360px;-->
+<!--            max-width: calc(100% - 30px);-->
+<!--            margin: 80px auto;-->
+<!--            background: white;-->
+<!--            padding: 24px;-->
+<!--            border-radius: 8px;-->
+<!--            box-shadow: 0 1px 5px rgba(0, 0, 0, 0.15);-->
+<!--        }-->
+
+<!--        #login-screen h1 {-->
+<!--            margin: 0 0 20px;-->
+<!--            font-size: 21px;-->
+<!--        }-->
+
+<!--        #login-screen input {-->
+<!--            width: 100%;-->
+<!--            padding: 10px;-->
+<!--            margin-bottom: 10px;-->
+<!--            border: 1px solid #ccc;-->
+<!--            border-radius: 4px;-->
+<!--            font-size: 14px;-->
+<!--        }-->
+
+<!--        #login-screen button {-->
+<!--            width: 100%;-->
+<!--            padding: 10px;-->
+<!--            margin-top: 4px;-->
+<!--            border: 0;-->
+<!--            border-radius: 4px;-->
+<!--            background: #2563eb;-->
+<!--            color: white;-->
+<!--            font-size: 14px;-->
+<!--        }-->
+
+<!--        #toggle-auth-mode {-->
+<!--            color: #2563eb;-->
+<!--            text-decoration: none;-->
+<!--        }-->
+
+<!--        #login-error {-->
+<!--            min-height: 18px;-->
+<!--            margin-top: 8px;-->
+<!--            color: #c0392b;-->
+<!--            font-size: 13px;-->
+<!--        }-->
+
+<!--        /* ================= APP ================= */-->
+
+<!--        #app-screen {-->
+<!--            height: 100vh;-->
+<!--            display: flex;-->
+<!--            flex-direction: column;-->
+<!--        }-->
+
+<!--        #top-bar {-->
+<!--            display: flex;-->
+<!--            justify-content: space-between;-->
+<!--            align-items: center;-->
+<!--            padding: 10px 16px;-->
+<!--            background: #1e293b;-->
+<!--            color: white;-->
+<!--        }-->
+
+<!--        #top-bar .left {-->
+<!--            display: flex;-->
+<!--            align-items: center;-->
+<!--            gap: 10px;-->
+<!--        }-->
+
+<!--        #top-bar .brand {-->
+<!--            font-weight: 700;-->
+<!--            font-size: 16px;-->
+<!--        }-->
+
+<!--        #top-bar .status {-->
+<!--            font-size: 12px;-->
+<!--        }-->
+
+<!--        #top-bar button {-->
+<!--            margin-left: 8px;-->
+<!--            padding: 7px 12px;-->
+<!--            border: 0;-->
+<!--            border-radius: 4px;-->
+<!--            background: #334155;-->
+<!--            color: white;-->
+<!--        }-->
+
+<!--        #main-body {-->
+<!--            flex: 1;-->
+<!--            display: flex;-->
+<!--            min-height: 0;-->
+<!--        }-->
+
+<!--        /* ================= SIDEBAR ================= */-->
+
+<!--        #sidebar {-->
+<!--            width: 280px;-->
+<!--            flex-shrink: 0;-->
+<!--            display: flex;-->
+<!--            flex-direction: column;-->
+<!--            min-height: 0;-->
+<!--            background: white;-->
+<!--            border-right: 1px solid #ddd;-->
+<!--        }-->
+
+<!--        #search-box {-->
+<!--            display: flex;-->
+<!--            gap: 6px;-->
+<!--            padding: 10px;-->
+<!--            border-bottom: 1px solid #eee;-->
+<!--        }-->
+
+<!--        #search-box input {-->
+<!--            flex: 1;-->
+<!--            min-width: 0;-->
+<!--            padding: 8px;-->
+<!--            border: 1px solid #ccc;-->
+<!--            border-radius: 4px;-->
+<!--        }-->
+
+<!--        #search-box button {-->
+<!--            padding: 8px 12px;-->
+<!--            border: 0;-->
+<!--            border-radius: 4px;-->
+<!--            background: #2563eb;-->
+<!--            color: white;-->
+<!--        }-->
+
+<!--        .section-label {-->
+<!--            padding: 9px 10px 4px;-->
+<!--            color: #888;-->
+<!--            font-size: 11px;-->
+<!--            text-transform: uppercase;-->
+<!--        }-->
+
+<!--        #search-results,-->
+<!--        #conversation-list {-->
+<!--            overflow-y: auto;-->
+<!--        }-->
+
+<!--        #search-results {-->
+<!--            max-height: 240px;-->
+<!--        }-->
+
+<!--        .list-item {-->
+<!--            padding: 10px;-->
+<!--            border-bottom: 1px solid #f0f0f0;-->
+<!--            cursor: pointer;-->
+<!--        }-->
+
+<!--        .list-item:hover {-->
+<!--            background: #f5f7fb;-->
+<!--        }-->
+
+<!--        .list-item.active {-->
+<!--            background: #e2e8f0;-->
+<!--        }-->
+
+<!--        .list-item .name {-->
+<!--            font-size: 14px;-->
+<!--            font-weight: 600;-->
+<!--        }-->
+
+<!--        .list-item .sub {-->
+<!--            margin-top: 2px;-->
+<!--            color: #777;-->
+<!--            font-size: 12px;-->
+<!--        }-->
+
+<!--        /* ================= CHAT ================= */-->
+
+<!--        #chat-area {-->
+<!--            flex: 1;-->
+<!--            min-width: 0;-->
+<!--            min-height: 0;-->
+<!--            display: flex;-->
+<!--            flex-direction: column;-->
+<!--            background: #f7f7f7;-->
+<!--        }-->
+
+<!--        #no-conversation {-->
+<!--            flex: 1;-->
+<!--            display: flex;-->
+<!--            align-items: center;-->
+<!--            justify-content: center;-->
+<!--            color: #999;-->
+<!--        }-->
+
+<!--        #chat-header {-->
+<!--            display: flex;-->
+<!--            align-items: center;-->
+<!--            gap: 8px;-->
+<!--            padding: 12px 16px;-->
+<!--            background: white;-->
+<!--            border-bottom: 1px solid #ddd;-->
+<!--            font-weight: 600;-->
+<!--        }-->
+
+<!--        #presence-indicator {-->
+<!--            font-size: 12px;-->
+<!--            font-weight: 500;-->
+<!--        }-->
+
+<!--        #presence-indicator.online {-->
+<!--            color: #16a34a;-->
+<!--        }-->
+
+<!--        #presence-indicator.offline {-->
+<!--            color: #777;-->
+<!--        }-->
+
+<!--        #messages {-->
+<!--            flex: 1;-->
+<!--            min-height: 0;-->
+<!--            overflow-y: auto;-->
+<!--            padding: 12px 16px;-->
+<!--        }-->
+
+<!--        .msg {-->
+<!--            position: relative;-->
+<!--            max-width: 60%;-->
+<!--            margin-bottom: 12px;-->
+<!--            padding: 7px 10px;-->
+<!--            border-radius: 8px;-->
+<!--            background: white;-->
+<!--            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);-->
+<!--        }-->
+
+<!--        .msg.own {-->
+<!--            margin-left: auto;-->
+<!--            background: #2563eb;-->
+<!--            color: white;-->
+<!--        }-->
+
+<!--        .msg .sender {-->
+<!--            margin-bottom: 3px;-->
+<!--            font-size: 11px;-->
+<!--            font-weight: 600;-->
+<!--            opacity: 0.7;-->
+<!--        }-->
+
+<!--        .msg .content {-->
+<!--            font-size: 14px;-->
+<!--            white-space: pre-wrap;-->
+<!--            word-break: break-word;-->
+<!--        }-->
+
+<!--        .message-meta {-->
+<!--            display: flex;-->
+<!--            justify-content: flex-end;-->
+<!--            min-height: 13px;-->
+<!--            margin-top: 4px;-->
+<!--        }-->
+
+<!--        .message-status {-->
+<!--            color: rgba(255, 255, 255, 0.95);-->
+<!--            font-size: 11px;-->
+<!--            font-weight: 600;-->
+<!--            white-space: nowrap;-->
+<!--        }-->
+
+<!--        .message-time-hover {-->
+<!--            display: none;-->
+<!--            position: absolute;-->
+<!--            right: 8px;-->
+<!--            bottom: -18px;-->
+<!--            z-index: 5;-->
+<!--            color: #666;-->
+<!--            font-size: 10px;-->
+<!--            white-space: nowrap;-->
+<!--        }-->
+
+<!--        .msg:hover .message-time-hover {-->
+<!--            display: block;-->
+<!--        }-->
+
+<!--        .time-separator {-->
+<!--            margin: 8px 0 12px;-->
+<!--            color: #777;-->
+<!--            font-size: 12px;-->
+<!--            text-align: center;-->
+<!--        }-->
+
+<!--        /* ================= INPUT ================= */-->
+
+<!--        #message-input-row {-->
+<!--            display: flex;-->
+<!--            gap: 8px;-->
+<!--            padding: 10px;-->
+<!--            background: white;-->
+<!--            border-top: 1px solid #ddd;-->
+<!--        }-->
+
+<!--        #message-input-row input {-->
+<!--            flex: 1;-->
+<!--            min-width: 0;-->
+<!--            padding: 9px;-->
+<!--            border: 1px solid #ccc;-->
+<!--            border-radius: 4px;-->
+<!--        }-->
+
+<!--        #message-input-row button {-->
+<!--            padding: 9px 18px;-->
+<!--            border: 0;-->
+<!--            border-radius: 4px;-->
+<!--            background: #2563eb;-->
+<!--            color: white;-->
+<!--        }-->
+
+<!--        #attach-btn {-->
+<!--            padding: 9px 12px;-->
+<!--            border: 1px solid #ccc;-->
+<!--            border-radius: 4px;-->
+<!--            background: white;-->
+<!--            font-size: 16px;-->
+<!--        }-->
+
+<!--        #file-preview-bar {-->
+<!--            display: flex;-->
+<!--            align-items: center;-->
+<!--            gap: 10px;-->
+<!--            padding: 8px 10px;-->
+<!--            background: #eef2ff;-->
+<!--            border-top: 1px solid #ddd;-->
+<!--        }-->
+
+<!--        #file-preview-bar img,-->
+<!--        #file-preview-bar video {-->
+<!--            max-height: 48px;-->
+<!--            max-width: 70px;-->
+<!--            border-radius: 4px;-->
+<!--            object-fit: cover;-->
+<!--        }-->
+
+<!--        #file-preview-info {-->
+<!--            flex: 1;-->
+<!--            min-width: 0;-->
+<!--            font-size: 12px;-->
+<!--            color: #333;-->
+<!--        }-->
+
+<!--        #file-preview-info .name {-->
+<!--            font-weight: 600;-->
+<!--            white-space: nowrap;-->
+<!--            overflow: hidden;-->
+<!--            text-overflow: ellipsis;-->
+<!--        }-->
+
+<!--        #file-preview-remove {-->
+<!--            padding: 4px 10px;-->
+<!--            border: 0;-->
+<!--            border-radius: 4px;-->
+<!--            background: #c0392b;-->
+<!--            color: white;-->
+<!--            font-size: 12px;-->
+<!--        }-->
+
+<!--        .file-content {-->
+<!--            margin-bottom: 4px;-->
+<!--        }-->
+
+<!--        .file-content img,-->
+<!--        .file-content video {-->
+<!--            display: block;-->
+<!--            max-width: 260px;-->
+<!--            max-height: 260px;-->
+<!--            border-radius: 6px;-->
+<!--        }-->
+
+<!--        .file-loading {-->
+<!--            padding: 6px 8px;-->
+<!--            font-size: 12px;-->
+<!--            opacity: 0.8;-->
+<!--        }-->
+
+<!--        .file-attachment {-->
+<!--            display: flex;-->
+<!--            align-items: center;-->
+<!--            gap: 8px;-->
+<!--            padding: 8px;-->
+<!--            border-radius: 6px;-->
+<!--            background: rgba(0, 0, 0, 0.06);-->
+<!--            text-decoration: none;-->
+<!--            color: inherit;-->
+<!--        }-->
+
+<!--        .msg.own .file-attachment {-->
+<!--            background: rgba(255, 255, 255, 0.15);-->
+<!--            color: white;-->
+<!--        }-->
+
+<!--        .file-attachment .icon {-->
+<!--            font-size: 20px;-->
+<!--        }-->
+
+<!--        .file-attachment .info {-->
+<!--            min-width: 0;-->
+<!--        }-->
+
+<!--        .file-attachment .filename {-->
+<!--            font-size: 13px;-->
+<!--            font-weight: 600;-->
+<!--            white-space: nowrap;-->
+<!--            overflow: hidden;-->
+<!--            text-overflow: ellipsis;-->
+<!--            max-width: 180px;-->
+<!--        }-->
+
+<!--        .file-attachment .filesize {-->
+<!--            font-size: 11px;-->
+<!--            opacity: 0.8;-->
+<!--        }-->
+
+<!--        /* ================= REPLY ================= */-->
+
+<!--        #reply-preview-bar {-->
+<!--            display: flex;-->
+<!--            align-items: center;-->
+<!--            gap: 10px;-->
+<!--            padding: 8px 10px;-->
+<!--            background: #eef2ff;-->
+<!--            border-top: 1px solid #ddd;-->
+<!--            border-left: 3px solid #2563eb;-->
+<!--        }-->
+
+<!--        #reply-preview-content {-->
+<!--            flex: 1;-->
+<!--            min-width: 0;-->
+<!--        }-->
+
+<!--        #reply-preview-content .reply-to-label {-->
+<!--            font-size: 11px;-->
+<!--            font-weight: 600;-->
+<!--            color: #2563eb;-->
+<!--            margin-bottom: 2px;-->
+<!--        }-->
+
+<!--        #reply-preview-content .reply-to-body {-->
+<!--            display: flex;-->
+<!--            align-items: center;-->
+<!--            gap: 8px;-->
+<!--            font-size: 13px;-->
+<!--            color: #444;-->
+<!--            white-space: nowrap;-->
+<!--            overflow: hidden;-->
+<!--            text-overflow: ellipsis;-->
+<!--        }-->
+
+<!--        #reply-preview-content .reply-to-body img {-->
+<!--            width: 32px;-->
+<!--            height: 32px;-->
+<!--            object-fit: cover;-->
+<!--            border-radius: 4px;-->
+<!--            flex-shrink: 0;-->
+<!--        }-->
+
+<!--        #reply-preview-cancel {-->
+<!--            padding: 4px 10px;-->
+<!--            border: 0;-->
+<!--            border-radius: 4px;-->
+<!--            background: #c0392b;-->
+<!--            color: white;-->
+<!--            font-size: 12px;-->
+<!--            flex-shrink: 0;-->
+<!--        }-->
+
+<!--        .reply-quote {-->
+<!--            display: flex;-->
+<!--            flex-direction: column;-->
+<!--            gap: 2px;-->
+<!--            margin-bottom: 6px;-->
+<!--            padding: 5px 8px;-->
+<!--            border-left: 3px solid #2563eb;-->
+<!--            border-radius: 4px;-->
+<!--            background: rgba(37, 99, 235, 0.08);-->
+<!--            cursor: pointer;-->
+<!--            font-size: 12px;-->
+<!--        }-->
+
+<!--        .msg.own .reply-quote {-->
+<!--            background: rgba(255, 255, 255, 0.18);-->
+<!--            border-left-color: rgba(255, 255, 255, 0.85);-->
+<!--        }-->
+
+<!--        .reply-quote .reply-quote-sender {-->
+<!--            font-weight: 600;-->
+<!--            opacity: 0.85;-->
+<!--        }-->
+
+<!--        .reply-quote .reply-quote-body {-->
+<!--            display: flex;-->
+<!--            align-items: center;-->
+<!--            gap: 5px;-->
+<!--            opacity: 0.9;-->
+<!--            white-space: nowrap;-->
+<!--            overflow: hidden;-->
+<!--            text-overflow: ellipsis;-->
+<!--        }-->
+
+<!--        .reply-btn {-->
+<!--            display: none;-->
+<!--            position: absolute;-->
+<!--            top: 4px;-->
+<!--            right: 4px;-->
+<!--            padding: 3px 6px;-->
+<!--            border: 1px solid rgba(0, 0, 0, 0.15);-->
+<!--            border-radius: 50%;-->
+<!--            background: white;-->
+<!--            color: #333;-->
+<!--            font-size: 13px;-->
+<!--            line-height: 1;-->
+<!--            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);-->
+<!--            z-index: 2;-->
+<!--        }-->
+
+<!--        .msg.own .reply-btn {-->
+<!--            right: auto;-->
+<!--            left: 4px;-->
+<!--            background: rgba(255, 255, 255, 0.9);-->
+<!--            color: #2563eb;-->
+<!--        }-->
+
+<!--        .msg:hover .reply-btn {-->
+<!--            display: block;-->
+<!--        }-->
+
+<!--        .msg.highlight {-->
+<!--            animation: msg-highlight-flash 1.4s ease;-->
+<!--        }-->
+
+<!--        @keyframes msg-highlight-flash {-->
+<!--            0% { box-shadow: 0 0 0 2px #f59e0b; }-->
+<!--            100% { box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1); }-->
+<!--        }-->
+
+<!--        /* ================= DEBUG ================= */-->
+
+<!--        #debug-panel {-->
+<!--            width: 300px;-->
+<!--            flex-shrink: 0;-->
+<!--            padding: 8px;-->
+<!--            overflow-y: auto;-->
+<!--            background: #0f172a;-->
+<!--            border-left: 1px solid #ddd;-->
+<!--            color: #9ae6b4;-->
+<!--            font-family: monospace;-->
+<!--            font-size: 11px;-->
+<!--        }-->
+
+<!--        .debug-title {-->
+<!--            margin-bottom: 6px;-->
+<!--            color: white;-->
+<!--            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",-->
+<!--            Roboto, Arial, sans-serif;-->
+<!--            font-weight: bold;-->
+<!--        }-->
+
+<!--        #debug-log div {-->
+<!--            margin-bottom: 4px;-->
+<!--            white-space: pre-wrap;-->
+<!--            word-break: break-word;-->
+<!--        }-->
+
+<!--        #debug-log .err {-->
+<!--            color: #fca5a5;-->
+<!--        }-->
+
+<!--        @media (max-width: 900px) {-->
+<!--            #debug-panel {-->
+<!--                display: none;-->
+<!--            }-->
+
+<!--            #sidebar {-->
+<!--                width: 240px;-->
+<!--            }-->
+<!--        }-->
+<!--    </style>-->
+<!--</head>-->
+
+<!--<body>-->
+
+<!--&lt;!&ndash; =========================================================-->
+<!--     LOGIN / REGISTER-->
+<!--========================================================= &ndash;&gt;-->
+
+<!--<div id="login-screen">-->
+
+<!--    <h1 id="auth-title">Yapp Login</h1>-->
+
+<!--    <div id="register-fields" class="hidden">-->
+<!--        <input-->
+<!--                type="text"-->
+<!--                id="register-username"-->
+<!--                placeholder="Username"-->
+<!--                autocomplete="username"-->
+<!--        >-->
+
+<!--        <input-->
+<!--                type="email"-->
+<!--                id="register-email"-->
+<!--                placeholder="Email"-->
+<!--                autocomplete="email"-->
+<!--        >-->
+<!--    </div>-->
+
+<!--    <input-->
+<!--            type="text"-->
+<!--            id="login-identifier"-->
+<!--            placeholder="Username or email"-->
+<!--            autocomplete="username"-->
+<!--    >-->
+
+<!--    <input-->
+<!--            type="password"-->
+<!--            id="login-password"-->
+<!--            placeholder="Password"-->
+<!--            autocomplete="current-password"-->
+<!--    >-->
+
+<!--    <button id="login-btn">Log In</button>-->
+<!--    <button id="register-btn" class="hidden">Register</button>-->
+
+<!--    <div id="login-error"></div>-->
+
+<!--    <p style="text-align:center;font-size:13px;margin-top:12px">-->
+<!--        <a href="#" id="toggle-auth-mode">-->
+<!--            Need an account? Register-->
+<!--        </a>-->
+<!--    </p>-->
+
+<!--</div>-->
+
+
+<!--&lt;!&ndash; =========================================================-->
+<!--     APPLICATION-->
+<!--========================================================= &ndash;&gt;-->
+
+<!--<div id="app-screen" class="hidden">-->
+
+<!--    <div id="top-bar">-->
+
+<!--        <div class="left">-->
+<!--            <span class="brand">YAPP</span>-->
+
+<!--            <span>-->
+<!--                Logged in as:-->
+<!--                <span id="current-username"></span>-->
+<!--            </span>-->
+
+<!--            <span class="status">-->
+<!--                Status:-->
+<!--                <span id="conn-status-label">Not connected</span>-->
+<!--            </span>-->
+<!--        </div>-->
+
+<!--        <div>-->
+<!--            <button id="connect-btn">Connect to Chat</button>-->
+<!--            <button id="logout-btn">Logout</button>-->
+<!--        </div>-->
+
+<!--    </div>-->
+
+
+<!--    <div id="main-body">-->
+
+<!--        &lt;!&ndash; SIDEBAR &ndash;&gt;-->
+
+<!--        <div id="sidebar">-->
+
+<!--            <div id="search-box">-->
+<!--                <input-->
+<!--                        type="text"-->
+<!--                        id="search-input"-->
+<!--                        placeholder="Search username..."-->
+<!--                >-->
+
+<!--                <button id="search-btn">-->
+<!--                    Search-->
+<!--                </button>-->
+<!--            </div>-->
+
+<!--            <div class="section-label">-->
+<!--                Search Results-->
+<!--            </div>-->
+
+<!--            <div id="search-results"></div>-->
+
+<!--            <div class="section-label">-->
+<!--                Chats-->
+<!--            </div>-->
+
+<!--            <div id="conversation-list"></div>-->
+
+<!--        </div>-->
+
+
+<!--        &lt;!&ndash; CHAT &ndash;&gt;-->
+
+<!--        <div id="chat-area">-->
+
+<!--            <div id="no-conversation">-->
+<!--                Select a user to start chatting-->
+<!--            </div>-->
+
+<!--            <div id="chat-header" class="hidden">-->
+<!--                <span id="chat-user-name"></span>-->
+<!--                <span id="presence-indicator"></span>-->
+<!--            </div>-->
+
+<!--            <div id="messages" class="hidden"></div>-->
+
+<!--            <div id="file-preview-bar" class="hidden">-->
+<!--                <div id="file-preview-thumb"></div>-->
+<!--                <div id="file-preview-info">-->
+<!--                    <div class="name" id="file-preview-name"></div>-->
+<!--                    <div id="file-preview-meta"></div>-->
+<!--                </div>-->
+<!--                <button id="file-preview-remove">Remove</button>-->
+<!--            </div>-->
+
+<!--            <div id="reply-preview-bar" class="hidden">-->
+<!--                <div id="reply-preview-content"></div>-->
+<!--                <button id="reply-preview-cancel">X</button>-->
+<!--            </div>-->
+
+<!--            <div id="message-input-row" class="hidden">-->
+
+<!--                <input type="file" id="file-input" class="hidden">-->
+
+<!--                <button id="attach-btn" title="Attach a file">-->
+<!--                    &#128206;-->
+<!--                </button>-->
+
+<!--                <input-->
+<!--                        type="text"-->
+<!--                        id="message-input"-->
+<!--                        placeholder="Type a message..."-->
+<!--                >-->
+
+<!--                <button id="send-btn">-->
+<!--                    SEND-->
+<!--                </button>-->
+
+<!--            </div>-->
+
+<!--        </div>-->
+
+
+<!--        &lt;!&ndash; DEBUG &ndash;&gt;-->
+
+<!--        <div id="debug-panel">-->
+
+<!--            <div class="debug-title">-->
+<!--                Debug Console-->
+<!--            </div>-->
+
+<!--            <div id="debug-log"></div>-->
+
+<!--        </div>-->
+
+<!--    </div>-->
+
+<!--</div>-->
+
+
+<!--<script>-->
+<!--    (function () {-->
+
+<!--        "use strict";-->
+
+
+<!--        /* =========================================================-->
+<!--           CONFIGURATION-->
+<!--        ========================================================= */-->
+
+<!--        const API_BASE_URL = "http://localhost:8080";-->
+<!--        const WS_URL = "ws://localhost:8080/ws";-->
+
+<!--        const LOGIN_ENDPOINT = "/api/auth/login";-->
+<!--        const REGISTER_ENDPOINT = "/api/auth/register";-->
+
+<!--        const USER_SEARCH_ENDPOINT = "/api/users/search";-->
+
+<!--        const DIRECT_CONVERSATION_ENDPOINT =-->
+<!--            "/api/conversations/direct";-->
+
+<!--        const MESSAGE_HISTORY_ENDPOINT =-->
+<!--            "/api/conversations";-->
+
+<!--        const PRESENCE_ENDPOINT =-->
+<!--            "/api/users";-->
+
+<!--        const FILE_UPLOAD_ENDPOINT =-->
+<!--            "/api/files/upload";-->
+
+<!--        const FILE_DOWNLOAD_ENDPOINT =-->
+<!--            "/api/files";-->
+
+<!--        const MAX_FILE_SIZE_BYTES =-->
+<!--            50 * 1024 * 1024;-->
+
+<!--        /*-->
+<!--         * STOMP application destinations.-->
+<!--         *-->
+<!--         * Backend mappings (ChatController):-->
+<!--         *-->
+<!--         * @MessageMapping("/chat")  -> CHAT_SEND_DESTINATION-->
+<!--         * @MessageMapping("/read")  -> READ_DESTINATION-->
+<!--         *-->
+<!--         * These are the ONLY two send destinations this-->
+<!--         * frontend is allowed to use. There is no such-->
+<!--         * thing as READ_ENDPOINT - if you ever see a-->
+<!--         * "READ_ENDPOINT is not defined" error, it means-->
+<!--         * a stale/cached copy of this file is being served.-->
+<!--         * grep this file for READ_ENDPOINT: it does not-->
+<!--         * exist here.-->
+<!--         */-->
+<!--        const CHAT_SEND_DESTINATION = "/app/chat";-->
+<!--        const READ_DESTINATION = "/app/read";-->
+
+<!--        /*-->
+<!--         * STOMP subscription destinations (user queues).-->
+<!--         */-->
+<!--        const USER_QUEUE_DESTINATION =-->
+<!--            "/user/queue/messages";-->
+
+<!--        const MESSAGE_STATUS_DESTINATION =-->
+<!--            "/user/queue/message-status";-->
+
+
+<!--        /* =========================================================-->
+<!--           STATE-->
+<!--        ========================================================= */-->
+
+<!--        let accessToken =-->
+<!--            localStorage.getItem("accessToken") || null;-->
+
+<!--        let currentUserId =-->
+<!--            localStorage.getItem("currentUserId") || null;-->
+
+<!--        let currentUsername =-->
+<!--            localStorage.getItem("currentUsername") || null;-->
+
+<!--        let stompClient = null;-->
+
+<!--        let isConnected = false;-->
+
+<!--        let activeConversationId = null;-->
+<!--        let activeOtherUserId = null;-->
+
+<!--        let presenceTimer = null;-->
+<!--        let relativeTimeTimer = null;-->
+
+<!--        let searchTimer = null;-->
+<!--        let searchRequestId = 0;-->
+
+<!--        /*-->
+<!--         * Map:-->
+<!--         *-->
+<!--         * conversationId -> {-->
+<!--         *     id,-->
+<!--         *     userId,-->
+<!--         *     username,-->
+<!--         *     displayName,-->
+<!--         *     messages: []-->
+<!--         * }-->
+<!--         */-->
+<!--        const conversations = new Map();-->
+
+<!--        let selectedFile = null;-->
+
+<!--        /*-->
+<!--         * The message currently being replied to, or null.-->
+<!--         *-->
+<!--         * Shape: {-->
+<!--         *     messageId, senderUsername, messageType,-->
+<!--         *     content, fileName, fileType-->
+<!--         * }-->
+<!--         */-->
+<!--        let replyingTo = null;-->
+
+<!--        /*-->
+<!--         * messageId -> object URL for a downloaded file's bytes.-->
+<!--         * Populated lazily, once per message, the first time that-->
+<!--         * message is rendered. Never re-fetched after that.-->
+<!--         */-->
+<!--        const fileBlobCache = new Map();-->
+
+<!--        const fileLoadInFlight = new Set();-->
+
+
+<!--        /* =========================================================-->
+<!--           DOM REFERENCES-->
+<!--        ========================================================= */-->
+
+<!--        const loginScreen =-->
+<!--            document.getElementById("login-screen");-->
+
+<!--        const appScreen =-->
+<!--            document.getElementById("app-screen");-->
+
+<!--        const authTitle =-->
+<!--            document.getElementById("auth-title");-->
+
+<!--        const registerFields =-->
+<!--            document.getElementById("register-fields");-->
+
+<!--        const registerUsername =-->
+<!--            document.getElementById("register-username");-->
+
+<!--        const registerEmail =-->
+<!--            document.getElementById("register-email");-->
+
+<!--        const loginIdentifier =-->
+<!--            document.getElementById("login-identifier");-->
+
+<!--        const loginPassword =-->
+<!--            document.getElementById("login-password");-->
+
+<!--        const loginBtn =-->
+<!--            document.getElementById("login-btn");-->
+
+<!--        const registerBtn =-->
+<!--            document.getElementById("register-btn");-->
+
+<!--        const loginError =-->
+<!--            document.getElementById("login-error");-->
+
+<!--        const toggleAuthModeLink =-->
+<!--            document.getElementById("toggle-auth-mode");-->
+
+<!--        const currentUsernameLabel =-->
+<!--            document.getElementById("current-username");-->
+
+<!--        const connStatusLabel =-->
+<!--            document.getElementById("conn-status-label");-->
+
+<!--        const connectBtn =-->
+<!--            document.getElementById("connect-btn");-->
+
+<!--        const logoutBtn =-->
+<!--            document.getElementById("logout-btn");-->
+
+<!--        const searchInput =-->
+<!--            document.getElementById("search-input");-->
+
+<!--        const searchBtn =-->
+<!--            document.getElementById("search-btn");-->
+
+<!--        const searchResultsEl =-->
+<!--            document.getElementById("search-results");-->
+
+<!--        const conversationListEl =-->
+<!--            document.getElementById("conversation-list");-->
+
+<!--        const noConversationEl =-->
+<!--            document.getElementById("no-conversation");-->
+
+<!--        const chatHeaderEl =-->
+<!--            document.getElementById("chat-header");-->
+
+<!--        const chatUserNameEl =-->
+<!--            document.getElementById("chat-user-name");-->
+
+<!--        const presenceIndicatorEl =-->
+<!--            document.getElementById("presence-indicator");-->
+
+<!--        const messagesEl =-->
+<!--            document.getElementById("messages");-->
+
+<!--        const messageInputRow =-->
+<!--            document.getElementById("message-input-row");-->
+
+<!--        const messageInput =-->
+<!--            document.getElementById("message-input");-->
+
+<!--        const sendBtn =-->
+<!--            document.getElementById("send-btn");-->
+
+<!--        const attachBtn =-->
+<!--            document.getElementById("attach-btn");-->
+
+<!--        const fileInputEl =-->
+<!--            document.getElementById("file-input");-->
+
+<!--        const filePreviewBar =-->
+<!--            document.getElementById("file-preview-bar");-->
+
+<!--        const filePreviewThumb =-->
+<!--            document.getElementById("file-preview-thumb");-->
+
+<!--        const filePreviewName =-->
+<!--            document.getElementById("file-preview-name");-->
+
+<!--        const filePreviewMeta =-->
+<!--            document.getElementById("file-preview-meta");-->
+
+<!--        const filePreviewRemoveBtn =-->
+<!--            document.getElementById("file-preview-remove");-->
+
+<!--        const replyPreviewBar =-->
+<!--            document.getElementById("reply-preview-bar");-->
+
+<!--        const replyPreviewContent =-->
+<!--            document.getElementById("reply-preview-content");-->
+
+<!--        const replyPreviewCancelBtn =-->
+<!--            document.getElementById("reply-preview-cancel");-->
+
+<!--        const debugLog =-->
+<!--            document.getElementById("debug-log");-->
+
+
+<!--        /* =========================================================-->
+<!--           DEBUG-->
+<!--        ========================================================= */-->
+
+<!--        function debug(message, isError = false) {-->
+
+<!--            const line =-->
+<!--                document.createElement("div");-->
+
+<!--            if (isError) {-->
+<!--                line.className = "err";-->
+<!--            }-->
+
+<!--            line.textContent =-->
+<!--                "[" +-->
+<!--                new Date().toLocaleTimeString() +-->
+<!--                "] " +-->
+<!--                message;-->
+
+<!--            debugLog.appendChild(line);-->
+
+<!--            debugLog.scrollTop =-->
+<!--                debugLog.scrollHeight;-->
+<!--        }-->
+
+
+<!--        /* =========================================================-->
+<!--           AUTH HELPERS-->
+<!--        ========================================================= */-->
+
+<!--        function authHeaders() {-->
+
+<!--            if (!accessToken) {-->
+<!--                return {};-->
+<!--            }-->
+
+<!--            return {-->
+<!--                "Authorization":-->
+<!--                    "Bearer " + accessToken-->
+<!--            };-->
+<!--        }-->
+
+
+<!--        function readJwtPayload(token) {-->
+
+<!--            try {-->
+
+<!--                const parts =-->
+<!--                    token.split(".");-->
+
+<!--                if (parts.length !== 3) {-->
+<!--                    throw new Error("Invalid JWT");-->
+<!--                }-->
+
+<!--                const base64 =-->
+<!--                    parts[1]-->
+<!--                        .replace(/-/g, "+")-->
+<!--                        .replace(/_/g, "/");-->
+
+<!--                const padded =-->
+<!--                    base64 +-->
+<!--                    "=".repeat(-->
+<!--                        (4 - base64.length % 4) % 4-->
+<!--                    );-->
+
+<!--                return JSON.parse(-->
+<!--                    atob(padded)-->
+<!--                );-->
+
+<!--            } catch (error) {-->
+
+<!--                debug(-->
+<!--                    "Could not read JWT payload: " +-->
+<!--                    error.message,-->
+<!--                    true-->
+<!--                );-->
+
+<!--                return null;-->
+<!--            }-->
+<!--        }-->
+
+
+<!--        function setCurrentUserFromToken(token) {-->
+
+<!--            const claims =-->
+<!--                readJwtPayload(token);-->
+
+<!--            if (!claims || !claims.sub) {-->
+
+<!--                throw new Error(-->
+<!--                    "JWT does not contain a user id"-->
+<!--                );-->
+<!--            }-->
+
+<!--            currentUserId =-->
+<!--                String(claims.sub);-->
+
+<!--            currentUsername =-->
+<!--                claims.username ||-->
+<!--                claims.userName ||-->
+<!--                "Unknown";-->
+
+<!--            localStorage.setItem(-->
+<!--                "currentUserId",-->
+<!--                currentUserId-->
+<!--            );-->
+
+<!--            localStorage.setItem(-->
+<!--                "currentUsername",-->
+<!--                currentUsername-->
+<!--            );-->
+<!--        }-->
+
+
+<!--        /* =========================================================-->
+<!--           SCREEN MANAGEMENT-->
+<!--        ========================================================= */-->
+
+<!--        function showApp() {-->
+
+<!--            loginScreen.classList.add("hidden");-->
+<!--            appScreen.classList.remove("hidden");-->
+
+<!--            currentUsernameLabel.textContent =-->
+<!--                currentUsername || "";-->
+<!--        }-->
+
+
+<!--        function showLogin() {-->
+
+<!--            appScreen.classList.add("hidden");-->
+<!--            loginScreen.classList.remove("hidden");-->
+<!--        }-->
+
+
+<!--        /* =========================================================-->
+<!--           LOGIN / REGISTER-->
+<!--        ========================================================= */-->
+
+<!--        let authMode = "login";-->
+
+
+<!--        toggleAuthModeLink.addEventListener(-->
+<!--            "click",-->
+<!--            function (event) {-->
+
+<!--                event.preventDefault();-->
+
+<!--                authMode =-->
+<!--                    authMode === "login"-->
+<!--                        ? "register"-->
+<!--                        : "login";-->
+
+<!--                loginError.textContent = "";-->
+
+<!--                if (authMode === "register") {-->
+
+<!--                    authTitle.textContent =-->
+<!--                        "Yapp Register";-->
+
+<!--                    registerFields.classList.remove(-->
+<!--                        "hidden"-->
+<!--                    );-->
+
+<!--                    loginBtn.classList.add(-->
+<!--                        "hidden"-->
+<!--                    );-->
+
+<!--                    registerBtn.classList.remove(-->
+<!--                        "hidden"-->
+<!--                    );-->
+
+<!--                    loginIdentifier.classList.add(-->
+<!--                        "hidden"-->
+<!--                    );-->
+
+<!--                    toggleAuthModeLink.textContent =-->
+<!--                        "Already have an account? Log In";-->
+
+<!--                } else {-->
+
+<!--                    authTitle.textContent =-->
+<!--                        "Yapp Login";-->
+
+<!--                    registerFields.classList.add(-->
+<!--                        "hidden"-->
+<!--                    );-->
+
+<!--                    loginBtn.classList.remove(-->
+<!--                        "hidden"-->
+<!--                    );-->
+
+<!--                    registerBtn.classList.add(-->
+<!--                        "hidden"-->
+<!--                    );-->
+
+<!--                    loginIdentifier.classList.remove(-->
+<!--                        "hidden"-->
+<!--                    );-->
+
+<!--                    toggleAuthModeLink.textContent =-->
+<!--                        "Need an account? Register";-->
+<!--                }-->
+<!--            }-->
+<!--        );-->
+
+
+<!--        registerBtn.addEventListener(-->
+<!--            "click",-->
+<!--            register-->
+<!--        );-->
+
+
+<!--        async function register() {-->
+
+<!--            const username =-->
+<!--                registerUsername.value.trim();-->
+
+<!--            const email =-->
+<!--                registerEmail.value.trim();-->
+
+<!--            const password =-->
+<!--                loginPassword.value;-->
+
+<!--            loginError.style.color =-->
+<!--                "#c0392b";-->
+
+<!--            loginError.textContent = "";-->
+
+<!--            if (!username || !password) {-->
+
+<!--                loginError.textContent =-->
+<!--                    "Please enter a username and password.";-->
+
+<!--                return;-->
+<!--            }-->
+
+<!--            const body = {-->
+<!--                username: username,-->
+<!--                password: password-->
+<!--            };-->
+
+<!--            if (email) {-->
+<!--                body.email = email;-->
+<!--            }-->
+
+<!--            try {-->
+
+<!--                debug(-->
+<!--                    "Registering user: " +-->
+<!--                    username-->
+<!--                );-->
+
+<!--                const response =-->
+<!--                    await fetch(-->
+<!--                        API_BASE_URL +-->
+<!--                        REGISTER_ENDPOINT,-->
+<!--                        {-->
+<!--                            method: "POST",-->
+<!--                            headers: {-->
+<!--                                "Content-Type":-->
+<!--                                    "application/json"-->
+<!--                            },-->
+<!--                            body:-->
+<!--                                JSON.stringify(body)-->
+<!--                        }-->
+<!--                    );-->
+
+<!--                if (!response.ok) {-->
+
+<!--                    throw new Error(-->
+<!--                        "Registration failed (" +-->
+<!--                        response.status +-->
+<!--                        ") " +-->
+<!--                        await response.text()-->
+<!--                            .catch(() => "")-->
+<!--                    );-->
+<!--                }-->
+
+<!--                debug(-->
+<!--                    "Registration successful. You can now log in."-->
+<!--                );-->
+
+<!--                toggleAuthModeLink.click();-->
+
+<!--                loginIdentifier.value =-->
+<!--                    username;-->
+
+<!--                loginPassword.value = "";-->
+
+<!--                loginError.style.color =-->
+<!--                    "#16a34a";-->
+
+<!--                loginError.textContent =-->
+<!--                    "Registered! Please log in.";-->
+
+<!--            } catch (error) {-->
+
+<!--                loginError.textContent =-->
+<!--                    error.message;-->
+
+<!--                debug(-->
+<!--                    "Registration error: " +-->
+<!--                    error.message,-->
+<!--                    true-->
+<!--                );-->
+<!--            }-->
+<!--        }-->
+
+
+<!--        loginBtn.addEventListener(-->
+<!--            "click",-->
+<!--            login-->
+<!--        );-->
+
+
+<!--        loginPassword.addEventListener(-->
+<!--            "keydown",-->
+<!--            function (event) {-->
+
+<!--                if (event.key === "Enter") {-->
+<!--                    login();-->
+<!--                }-->
+<!--            }-->
+<!--        );-->
+
+
+<!--        async function login() {-->
+
+<!--            const identifier =-->
+<!--                loginIdentifier.value.trim();-->
+
+<!--            const password =-->
+<!--                loginPassword.value;-->
+
+<!--            loginError.style.color =-->
+<!--                "#c0392b";-->
+
+<!--            loginError.textContent = "";-->
+
+<!--            if (!identifier || !password) {-->
+
+<!--                loginError.textContent =-->
+<!--                    "Please enter username/email and password.";-->
+
+<!--                return;-->
+<!--            }-->
+
+<!--            try {-->
+
+<!--                debug("Logging in...");-->
+
+<!--                const response =-->
+<!--                    await fetch(-->
+<!--                        API_BASE_URL +-->
+<!--                        LOGIN_ENDPOINT,-->
+<!--                        {-->
+<!--                            method: "POST",-->
+<!--                            headers: {-->
+<!--                                "Content-Type":-->
+<!--                                    "application/json"-->
+<!--                            },-->
+<!--                            body:-->
+<!--                                JSON.stringify({-->
+<!--                                    identifier:-->
+<!--                                    identifier,-->
+<!--                                    password:-->
+<!--                                    password-->
+<!--                                })-->
+<!--                        }-->
+<!--                    );-->
+
+<!--                if (!response.ok) {-->
+
+<!--                    throw new Error(-->
+<!--                        "Login failed (" +-->
+<!--                        response.status +-->
+<!--                        ") " +-->
+<!--                        await response.text()-->
+<!--                            .catch(() => "")-->
+<!--                    );-->
+<!--                }-->
+
+<!--                const data =-->
+<!--                    await response.json();-->
+
+<!--                if (!data.token) {-->
+<!--                    throw new Error(-->
+<!--                        "Login response did not contain a token."-->
+<!--                    );-->
+<!--                }-->
+
+<!--                accessToken =-->
+<!--                    data.token;-->
+
+<!--                setCurrentUserFromToken(-->
+<!--                    accessToken-->
+<!--                );-->
+
+<!--                localStorage.setItem(-->
+<!--                    "accessToken",-->
+<!--                    accessToken-->
+<!--                );-->
+
+<!--                debug("Login successful.");-->
+
+<!--                debug(-->
+<!--                    "Logged in as: " +-->
+<!--                    currentUsername-->
+<!--                );-->
+
+<!--                showApp();-->
+
+<!--            } catch (error) {-->
+
+<!--                loginError.textContent =-->
+<!--                    error.message;-->
+
+<!--                debug(-->
+<!--                    "Login error: " +-->
+<!--                    error.message,-->
+<!--                    true-->
+<!--                );-->
+<!--            }-->
+<!--        }-->
+
+
+<!--        /* =========================================================-->
+<!--           LOGOUT-->
+<!--        ========================================================= */-->
+
+<!--        logoutBtn.addEventListener(-->
+<!--            "click",-->
+<!--            logout-->
+<!--        );-->
+
+
+<!--        function logout() {-->
+
+<!--            disconnectSocket();-->
+
+<!--            localStorage.removeItem(-->
+<!--                "accessToken"-->
+<!--            );-->
+
+<!--            localStorage.removeItem(-->
+<!--                "currentUserId"-->
+<!--            );-->
+
+<!--            localStorage.removeItem(-->
+<!--                "currentUsername"-->
+<!--            );-->
+
+<!--            accessToken = null;-->
+<!--            currentUserId = null;-->
+<!--            currentUsername = null;-->
+
+<!--            conversations.clear();-->
+
+<!--            activeConversationId = null;-->
+<!--            activeOtherUserId = null;-->
+
+<!--            conversationListEl.innerHTML = "";-->
+<!--            searchResultsEl.innerHTML = "";-->
+
+<!--            resetChatArea();-->
+
+<!--            debug("Logged out.");-->
+
+<!--            showLogin();-->
+<!--        }-->
+
+
+<!--        /* =========================================================-->
+<!--           WEBSOCKET CONNECTION-->
+<!--        ========================================================= */-->
+
+<!--        connectBtn.addEventListener(-->
+<!--            "click",-->
+<!--            function () {-->
+
+<!--                if (isConnected) {-->
+<!--                    disconnectSocket();-->
+<!--                } else {-->
+<!--                    connectSocket();-->
+<!--                }-->
+<!--            }-->
+<!--        );-->
+
+
+<!--        function connectSocket() {-->
+
+<!--            if (!accessToken) {-->
+
+<!--                debug(-->
+<!--                    "No JWT available, cannot connect.",-->
+<!--                    true-->
+<!--                );-->
+
+<!--                return;-->
+<!--            }-->
+
+<!--            if (stompClient) {-->
+<!--                return;-->
+<!--            }-->
+
+<!--            debug(-->
+<!--                "WebSocket connecting to " +-->
+<!--                WS_URL-->
+<!--            );-->
+
+<!--            stompClient =-->
+<!--                new StompJs.Client({-->
+
+<!--                    brokerURL: WS_URL,-->
+
+<!--                    connectHeaders: {-->
+<!--                        Authorization:-->
+<!--                            "Bearer " +-->
+<!--                            accessToken-->
+<!--                    },-->
+
+<!--                    debug: function () {},-->
+
+<!--                    reconnectDelay: 0,-->
+
+<!--                    onConnect:-->
+<!--                    onStompConnected,-->
+
+<!--                    onDisconnect:-->
+<!--                    onStompDisconnected,-->
+
+<!--                    onWebSocketClose:-->
+<!--                    onStompDisconnected,-->
+
+<!--                    onStompError:-->
+<!--                        function (frame) {-->
+
+<!--                            debug(-->
+<!--                                "STOMP error: " +-->
+<!--                                (-->
+<!--                                    frame.headers &&-->
+<!--                                    frame.headers.message-->
+<!--                                        ? frame.headers.message-->
+<!--                                        : "unknown"-->
+<!--                                ),-->
+<!--                                true-->
+<!--                            );-->
+<!--                        }-->
+<!--                });-->
+
+<!--            /*-->
+<!--             * NOTE: connecting the socket only opens the-->
+<!--             * subscriptions below. It must NEVER, by itself,-->
+<!--             * mark any message as read. Read receipts are-->
+<!--             * only ever sent from openConversation() and-->
+<!--             * handleIncomingMessage(), both further down.-->
+<!--             */-->
+<!--            stompClient.activate();-->
+<!--        }-->
+
+
+<!--        function onStompConnected() {-->
+
+<!--            isConnected = true;-->
+
+<!--            connStatusLabel.textContent =-->
+<!--                "CONNECTED";-->
+
+<!--            connectBtn.textContent =-->
+<!--                "Disconnect";-->
+
+<!--            debug("STOMP connected.");-->
+
+
+<!--            /* RECEIVE CHAT MESSAGES */-->
+
+<!--            stompClient.subscribe(-->
+<!--                USER_QUEUE_DESTINATION,-->
+<!--                function (message) {-->
+
+<!--                    handleIncomingMessage(-->
+<!--                        message-->
+<!--                    );-->
+<!--                }-->
+<!--            );-->
+
+
+<!--            /* RECEIVE SENT / READ STATUS */-->
+
+<!--            stompClient.subscribe(-->
+<!--                MESSAGE_STATUS_DESTINATION,-->
+<!--                function (message) {-->
+
+<!--                    handleMessageStatus(-->
+<!--                        message-->
+<!--                    );-->
+<!--                }-->
+<!--            );-->
+
+
+<!--            debug(-->
+<!--                "Subscribed to " +-->
+<!--                USER_QUEUE_DESTINATION-->
+<!--            );-->
+
+<!--            debug(-->
+<!--                "Subscribed to " +-->
+<!--                MESSAGE_STATUS_DESTINATION-->
+<!--            );-->
+<!--        }-->
+
+
+<!--        function onStompDisconnected() {-->
+
+<!--            isConnected = false;-->
+
+<!--            connStatusLabel.textContent =-->
+<!--                "DISCONNECTED";-->
+
+<!--            connectBtn.textContent =-->
+<!--                "Connect to Chat";-->
+
+<!--            stompClient = null;-->
+<!--        }-->
+
+
+<!--        function disconnectSocket() {-->
+
+<!--            if (stompClient) {-->
+
+<!--                const client =-->
+<!--                    stompClient;-->
+
+<!--                stompClient = null;-->
+
+<!--                client.deactivate()-->
+<!--                    .catch(function () {});-->
+
+<!--            }-->
+
+<!--            isConnected = false;-->
+
+<!--            connStatusLabel.textContent =-->
+<!--                "Not connected";-->
+
+<!--            connectBtn.textContent =-->
+<!--                "Connect to Chat";-->
+<!--        }-->
+
+
+<!--        /* =========================================================-->
+<!--           MESSAGE STATUS (SENT / READ from /user/queue/message-status)-->
+<!--        ========================================================= */-->
+
+<!--        function handleMessageStatus(-->
+<!--            stompMessage-->
+<!--        ) {-->
+
+<!--            let payload;-->
+
+<!--            try {-->
+
+<!--                payload =-->
+<!--                    JSON.parse(-->
+<!--                        stompMessage.body-->
+<!--                    );-->
+
+<!--            } catch (error) {-->
+
+<!--                debug(-->
+<!--                    "Invalid message-status payload.",-->
+<!--                    true-->
+<!--                );-->
+
+<!--                return;-->
+<!--            }-->
+
+<!--            const messageId =-->
+<!--                payload.messageId ||-->
+<!--                payload.id ||-->
+<!--                null;-->
+
+<!--            const conversationId =-->
+<!--                payload.conversationId ||-->
+<!--                null;-->
+
+<!--            const status =-->
+<!--                String(-->
+<!--                    payload.status || ""-->
+<!--                ).toUpperCase();-->
+
+
+<!--            /*-->
+<!--             * Backend sends SENT, DELIVERED, and READ.-->
+<!--             * We only display SENT and READ ("Seen").-->
+<!--             * DELIVERED is intentionally ignored.-->
+<!--             */-->
+
+<!--            if (-->
+<!--                status !== "SENT" &&-->
+<!--                status !== "READ"-->
+<!--            ) {-->
+<!--                return;-->
+<!--            }-->
+
+<!--            if (!conversationId) {-->
+<!--                return;-->
+<!--            }-->
+
+<!--            const conversation =-->
+<!--                conversations.get(-->
+<!--                    conversationId-->
+<!--                );-->
+
+<!--            if (!conversation) {-->
+<!--                return;-->
+<!--            }-->
+
+
+<!--            /* ================= SENT ================= */-->
+
+<!--            if (status === "SENT") {-->
+
+<!--                let pendingMessage = null;-->
+
+<!--                for (-->
+<!--                    let i =-->
+<!--                        conversation.messages.length - 1;-->
+<!--                    i >= 0;-->
+<!--                    i&#45;&#45;-->
+<!--                ) {-->
+
+<!--                    const message =-->
+<!--                        conversation.messages[i];-->
+
+<!--                    if (-->
+<!--                        message.senderUsername ===-->
+<!--                        currentUsername &&-->
+<!--                        message.pending === true-->
+<!--                    ) {-->
+
+<!--                        pendingMessage =-->
+<!--                            message;-->
+
+<!--                        break;-->
+<!--                    }-->
+<!--                }-->
+
+
+<!--                if (pendingMessage) {-->
+
+<!--                    pendingMessage.id =-->
+<!--                        messageId;-->
+
+<!--                    pendingMessage.pending =-->
+<!--                        false;-->
+
+<!--                    pendingMessage.status =-->
+<!--                        "SENT";-->
+
+<!--                    pendingMessage.statusUpdatedAt =-->
+<!--                        new Date().toISOString();-->
+
+<!--                    debug(-->
+<!--                        "Message status updated: SENT"-->
+<!--                    );-->
+
+<!--                    renderConversationList();-->
+
+<!--                    if (-->
+<!--                        conversationId ===-->
+<!--                        activeConversationId-->
+<!--                    ) {-->
+<!--                        renderMessages();-->
+<!--                    }-->
+<!--                }-->
+<!--            }-->
+
+
+<!--            /* ================= READ ================= */-->
+
+<!--            if (-->
+<!--                status === "READ" &&-->
+<!--                messageId-->
+<!--            ) {-->
+
+<!--                const message =-->
+<!--                    conversation.messages.find(-->
+<!--                        function (item) {-->
+
+<!--                            return String(item.id) ===-->
+<!--                                String(messageId);-->
+<!--                        }-->
+<!--                    );-->
+
+
+<!--                if (-->
+<!--                    message &&-->
+<!--                    message.senderUsername ===-->
+<!--                    currentUsername-->
+<!--                ) {-->
+
+<!--                    message.status =-->
+<!--                        "READ";-->
+
+<!--                    message.statusUpdatedAt =-->
+<!--                        new Date().toISOString();-->
+
+<!--                    debug(-->
+<!--                        "Message status updated: READ"-->
+<!--                    );-->
+
+<!--                    renderConversationList();-->
+
+<!--                    if (-->
+<!--                        conversationId ===-->
+<!--                        activeConversationId-->
+<!--                    ) {-->
+<!--                        renderMessages();-->
+<!--                    }-->
+<!--                }-->
+<!--            }-->
+<!--        }-->
+
+
+<!--        /* =========================================================-->
+<!--           INCOMING MESSAGE (from /user/queue/messages)-->
+<!--        ========================================================= */-->
+
+<!--        async function handleIncomingMessage(-->
+<!--            stompMessage-->
+<!--        ) {-->
+
+<!--            let payload;-->
+
+<!--            try {-->
+
+<!--                payload =-->
+<!--                    JSON.parse(-->
+<!--                        stompMessage.body-->
+<!--                    );-->
+
+<!--            } catch (error) {-->
+
+<!--                debug(-->
+<!--                    "Failed to parse incoming message: " +-->
+<!--                    error.message,-->
+<!--                    true-->
+<!--                );-->
+
+<!--                return;-->
+<!--            }-->
+
+
+<!--            const conversationId =-->
+<!--                payload.conversationId;-->
+
+<!--            const senderUsername =-->
+<!--                payload.senderUserName ||-->
+<!--                payload.senderUsername ||-->
+<!--                payload.sender ||-->
+<!--                "unknown";-->
+
+<!--            const content =-->
+<!--                payload.content || "";-->
+
+<!--            const messageId =-->
+<!--                payload.messageId ||-->
+<!--                payload.id ||-->
+<!--                null;-->
+
+<!--            const createdAt =-->
+<!--                payload.createdAt ||-->
+<!--                new Date().toISOString();-->
+
+<!--            const messageType =-->
+<!--                payload.messageType ||-->
+<!--                "TEXT";-->
+
+<!--            const fileName =-->
+<!--                payload.fileName ||-->
+<!--                null;-->
+
+<!--            const fileUrl =-->
+<!--                payload.fileUrl ||-->
+<!--                null;-->
+
+<!--            const fileType =-->
+<!--                payload.fileType ||-->
+<!--                null;-->
+
+<!--            const fileSize =-->
+<!--                payload.fileSize ||-->
+<!--                null;-->
+
+<!--            const replyToMessageId =-->
+<!--                payload.replyToMessageId ||-->
+<!--                null;-->
+
+<!--            const replyToContent =-->
+<!--                payload.replyToContent ||-->
+<!--                null;-->
+
+<!--            const replyToSenderUserName =-->
+<!--                payload.replyToSenderUserName ||-->
+<!--                null;-->
+
+<!--            const replyToMessageType =-->
+<!--                payload.replyToMessageType ||-->
+<!--                null;-->
+
+<!--            const replyToFileName =-->
+<!--                payload.replyToFileName ||-->
+<!--                null;-->
+
+
+<!--            if (!conversationId) {-->
+
+<!--                debug(-->
+<!--                    "Incoming message has no conversationId.",-->
+<!--                    true-->
+<!--                );-->
+
+<!--                return;-->
+<!--            }-->
+
+
+<!--            let conversation =-->
+<!--                conversations.get(-->
+<!--                    conversationId-->
+<!--                );-->
+
+
+<!--            if (!conversation) {-->
+
+<!--                conversation = {-->
+<!--                    id: conversationId,-->
+<!--                    userId: null,-->
+<!--                    username: senderUsername,-->
+<!--                    displayName: "",-->
+<!--                    messages: []-->
+<!--                };-->
+
+<!--                conversations.set(-->
+<!--                    conversationId,-->
+<!--                    conversation-->
+<!--                );-->
+<!--            }-->
+
+
+<!--            /*-->
+<!--             * Do not add the same message twice.-->
+<!--             * (Backend echoes the message back to the-->
+<!--             * sender too, so the sender's own socket will-->
+<!--             * also receive this event.)-->
+<!--             */-->
+
+<!--            const alreadyExists =-->
+<!--                messageId &&-->
+<!--                conversation.messages.some(-->
+<!--                    function (message) {-->
+
+<!--                        return String(message.id) ===-->
+<!--                            String(messageId);-->
+<!--                    }-->
+<!--                );-->
+
+
+<!--            /*-->
+<!--             * SELF-ECHO RECONCILIATION-->
+<!--             *-->
+<!--             * If this event is the echo of a message WE-->
+<!--             * just sent, it must NOT be pushed as a new-->
+<!--             * entry - sendMessage() already added an-->
+<!--             * optimistic placeholder (id: null, pending:-->
+<!--             * true) for it. Instead, find that placeholder-->
+<!--             * (oldest unresolved pending message with-->
+<!--             * matching content) and fill in its real id.-->
+<!--             *-->
+<!--             * Without this reconciliation, every message-->
+<!--             * you send ends up duplicated: once as the-->
+<!--             * optimistic placeholder, once as the echo - -->
+<!--             * and if the SENT status event also races in-->
+<!--             * separately, a third copy can appear.-->
+<!--             */-->
+
+<!--            if (-->
+<!--                !alreadyExists &&-->
+<!--                senderUsername ===-->
+<!--                currentUsername-->
+<!--            ) {-->
+
+<!--                const pendingMatch =-->
+<!--                    conversation.messages.find(-->
+<!--                        function (message) {-->
+
+<!--                            return (-->
+<!--                                message.pending === true &&-->
+<!--                                message.senderUsername ===-->
+<!--                                currentUsername &&-->
+<!--                                message.content === content-->
+<!--                            );-->
+<!--                        }-->
+<!--                    );-->
+
+
+<!--                if (pendingMatch) {-->
+
+<!--                    pendingMatch.id =-->
+<!--                        messageId;-->
+
+<!--                    pendingMatch.pending =-->
+<!--                        false;-->
+
+<!--                    pendingMatch.createdAt =-->
+<!--                        createdAt;-->
+
+<!--                    pendingMatch.status =-->
+<!--                        "SENT";-->
+
+<!--                    pendingMatch.statusUpdatedAt =-->
+<!--                        new Date().toISOString();-->
+
+<!--                    pendingMatch.replyToMessageId =-->
+<!--                        replyToMessageId ||-->
+<!--                        pendingMatch.replyToMessageId ||-->
+<!--                        null;-->
+
+<!--                    pendingMatch.replyToContent =-->
+<!--                        replyToContent ||-->
+<!--                        pendingMatch.replyToContent ||-->
+<!--                        null;-->
+
+<!--                    pendingMatch.replyToSenderUserName =-->
+<!--                        replyToSenderUserName ||-->
+<!--                        pendingMatch.replyToSenderUserName ||-->
+<!--                        null;-->
+
+<!--                    pendingMatch.replyToMessageType =-->
+<!--                        replyToMessageType ||-->
+<!--                        pendingMatch.replyToMessageType ||-->
+<!--                        null;-->
+
+<!--                    pendingMatch.replyToFileName =-->
+<!--                        replyToFileName ||-->
+<!--                        pendingMatch.replyToFileName ||-->
+<!--                        null;-->
+
+<!--                } else {-->
+
+<!--                    conversation.messages.push({-->
+
+<!--                        id: messageId,-->
+
+<!--                        senderUsername:-->
+<!--                        senderUsername,-->
+
+<!--                        content:-->
+<!--                        content,-->
+
+<!--                        createdAt:-->
+<!--                        createdAt,-->
+
+<!--                        status:-->
+<!--                            "SENT",-->
+
+<!--                        statusUpdatedAt:-->
+<!--                            new Date().toISOString(),-->
+
+<!--                        pending:-->
+<!--                            false,-->
+
+<!--                        messageType:-->
+<!--                        messageType,-->
+
+<!--                        fileName:-->
+<!--                        fileName,-->
+
+<!--                        fileUrl:-->
+<!--                        fileUrl,-->
+
+<!--                        fileType:-->
+<!--                        fileType,-->
+
+<!--                        fileSize:-->
+<!--                        fileSize,-->
+
+<!--                        replyToMessageId:-->
+<!--                        replyToMessageId,-->
+
+<!--                        replyToContent:-->
+<!--                        replyToContent,-->
+
+<!--                        replyToSenderUserName:-->
+<!--                        replyToSenderUserName,-->
+
+<!--                        replyToMessageType:-->
+<!--                        replyToMessageType,-->
+
+<!--                        replyToFileName:-->
+<!--                        replyToFileName-->
+<!--                    });-->
+<!--                }-->
+
+<!--            } else if (!alreadyExists) {-->
+
+<!--                conversation.messages.push({-->
+
+<!--                    id: messageId,-->
+
+<!--                    senderUsername:-->
+<!--                    senderUsername,-->
+
+<!--                    content:-->
+<!--                    content,-->
+
+<!--                    createdAt:-->
+<!--                    createdAt,-->
+
+<!--                    status:-->
+<!--                        "SENT",-->
+
+<!--                    statusUpdatedAt:-->
+<!--                        new Date().toISOString(),-->
+
+<!--                    pending:-->
+<!--                        false,-->
+
+<!--                    messageType:-->
+<!--                    messageType,-->
+
+<!--                    fileName:-->
+<!--                    fileName,-->
+
+<!--                    fileUrl:-->
+<!--                    fileUrl,-->
+
+<!--                    fileType:-->
+<!--                    fileType,-->
+
+<!--                    fileSize:-->
+<!--                    fileSize,-->
+
+<!--                    replyToMessageId:-->
+<!--                    replyToMessageId,-->
+
+<!--                    replyToContent:-->
+<!--                    replyToContent,-->
+
+<!--                    replyToSenderUserName:-->
+<!--                    replyToSenderUserName,-->
+
+<!--                    replyToMessageType:-->
+<!--                    replyToMessageType,-->
+
+<!--                    replyToFileName:-->
+<!--                    replyToFileName-->
+<!--                });-->
+<!--            }-->
+
+
+<!--            debug(-->
+<!--                "Message received from " +-->
+<!--                senderUsername +-->
+<!--                " in conversation " +-->
+<!--                conversationId-->
+<!--            );-->
+
+<!--            renderConversationList();-->
+
+
+<!--            /*-->
+<!--             * IMPORTANT READ LOGIC-->
+<!--             *-->
+<!--             * Only mark as READ if:-->
+<!--             *   1. this conversation is the one currently open, AND-->
+<!--             *   2. the message was not sent by us.-->
+<!--             *-->
+<!--             * If the conversation is not open, do NOT mark it read.-->
+<!--             * Simply being connected to the socket never triggers-->
+<!--             * a read receipt on its own.-->
+<!--             */-->
+
+<!--            if (-->
+<!--                conversationId ===-->
+<!--                activeConversationId-->
+<!--            ) {-->
+
+<!--                renderMessages();-->
+
+<!--                if (-->
+<!--                    messageId &&-->
+<!--                    senderUsername !==-->
+<!--                    currentUsername-->
+<!--                ) {-->
+
+<!--                    markMessageAsRead(-->
+<!--                        conversationId,-->
+<!--                        messageId-->
+<!--                    );-->
+<!--                }-->
+<!--            }-->
+<!--        }-->
+
+
+<!--        /* =========================================================-->
+<!--           SEARCH-->
+<!--        ========================================================= */-->
+
+<!--        searchBtn.addEventListener(-->
+<!--            "click",-->
+<!--            performSearch-->
+<!--        );-->
+
+
+<!--        searchInput.addEventListener(-->
+<!--            "input",-->
+<!--            function () {-->
+
+<!--                clearTimeout(-->
+<!--                    searchTimer-->
+<!--                );-->
+
+<!--                const query =-->
+<!--                    searchInput.value.trim();-->
+
+<!--                if (!query) {-->
+
+<!--                    searchResultsEl.innerHTML =-->
+<!--                        "";-->
+
+<!--                    return;-->
+<!--                }-->
+
+<!--                searchTimer =-->
+<!--                    setTimeout(-->
+<!--                        performSearch,-->
+<!--                        300-->
+<!--                    );-->
+<!--            }-->
+<!--        );-->
+
+
+<!--        searchInput.addEventListener(-->
+<!--            "keydown",-->
+<!--            function (event) {-->
+
+<!--                if (event.key === "Enter") {-->
+
+<!--                    clearTimeout(-->
+<!--                        searchTimer-->
+<!--                    );-->
+
+<!--                    performSearch();-->
+<!--                }-->
+<!--            }-->
+<!--        );-->
+
+
+<!--        async function performSearch() {-->
+
+<!--            const query =-->
+<!--                searchInput.value.trim();-->
+
+<!--            if (!query) {-->
+
+<!--                searchResultsEl.innerHTML =-->
+<!--                    "";-->
+
+<!--                return;-->
+<!--            }-->
+
+<!--            const requestId =-->
+<!--                ++searchRequestId;-->
+
+
+<!--            try {-->
+
+<!--                debug(-->
+<!--                    "Searching users: " +-->
+<!--                    query-->
+<!--                );-->
+
+<!--                const response =-->
+<!--                    await fetch(-->
+<!--                        API_BASE_URL +-->
+<!--                        USER_SEARCH_ENDPOINT +-->
+<!--                        "?username=" +-->
+<!--                        encodeURIComponent(query),-->
+<!--                        {-->
+<!--                            headers:-->
+<!--                                authHeaders()-->
+<!--                        }-->
+<!--                    );-->
+
+
+<!--                if (!response.ok) {-->
+
+<!--                    throw new Error(-->
+<!--                        "Search failed (" +-->
+<!--                        response.status +-->
+<!--                        ")"-->
+<!--                    );-->
+<!--                }-->
+
+
+<!--                const results =-->
+<!--                    await response.json();-->
+
+
+<!--                /*-->
+<!--                 * Ignore an old search response-->
+<!--                 * if the user already typed something else.-->
+<!--                 */-->
+
+<!--                if (-->
+<!--                    requestId !==-->
+<!--                    searchRequestId ||-->
+<!--                    searchInput.value.trim() !==-->
+<!--                    query-->
+<!--                ) {-->
+<!--                    return;-->
+<!--                }-->
+
+
+<!--                debug(-->
+<!--                    "Search results received for: " +-->
+<!--                    query-->
+<!--                );-->
+
+<!--                renderSearchResults(-->
+<!--                    Array.isArray(results)-->
+<!--                        ? results-->
+<!--                        : []-->
+<!--                );-->
+
+<!--            } catch (error) {-->
+
+<!--                if (-->
+<!--                    requestId !==-->
+<!--                    searchRequestId-->
+<!--                ) {-->
+<!--                    return;-->
+<!--                }-->
+
+<!--                debug(-->
+<!--                    "Search error: " +-->
+<!--                    error.message,-->
+<!--                    true-->
+<!--                );-->
+<!--            }-->
+<!--        }-->
+
+
+<!--        function renderSearchResults(-->
+<!--            results-->
+<!--        ) {-->
+
+<!--            searchResultsEl.innerHTML = "";-->
+
+
+<!--            results-->
+<!--                .filter(function (user) {-->
+
+<!--                    const username =-->
+<!--                        user.username ||-->
+<!--                        user.userName ||-->
+<!--                        "";-->
+
+<!--                    return (-->
+<!--                        username &&-->
+<!--                        username !==-->
+<!--                        currentUsername-->
+<!--                    );-->
+<!--                })-->
+<!--                .forEach(function (user) {-->
+
+<!--                    const userId =-->
+<!--                        user.id;-->
+
+<!--                    const username =-->
+<!--                        user.username ||-->
+<!--                        user.userName ||-->
+<!--                        "";-->
+
+<!--                    const displayName =-->
+<!--                        user.displayName ||-->
+<!--                        "";-->
+
+
+<!--                    if (-->
+<!--                        !userId ||-->
+<!--                        !username-->
+<!--                    ) {-->
+<!--                        return;-->
+<!--                    }-->
+
+
+<!--                    const item =-->
+<!--                        document.createElement("div");-->
+
+<!--                    item.className =-->
+<!--                        "list-item";-->
+
+
+<!--                    const name =-->
+<!--                        document.createElement("div");-->
+
+<!--                    name.className =-->
+<!--                        "name";-->
+
+<!--                    name.textContent =-->
+<!--                        username;-->
+
+
+<!--                    item.appendChild(name);-->
+
+
+<!--                    if (displayName) {-->
+
+<!--                        const sub =-->
+<!--                            document.createElement("div");-->
+
+<!--                        sub.className =-->
+<!--                            "sub";-->
+
+<!--                        sub.textContent =-->
+<!--                            displayName;-->
+
+<!--                        item.appendChild(sub);-->
+<!--                    }-->
+
+
+<!--                    item.addEventListener(-->
+<!--                        "click",-->
+<!--                        function () {-->
+
+<!--                            openConversation(-->
+<!--                                user-->
+<!--                            );-->
+<!--                        }-->
+<!--                    );-->
+
+
+<!--                    searchResultsEl.appendChild(-->
+<!--                        item-->
+<!--                    );-->
+<!--                });-->
+<!--        }-->
+
+
+<!--        /* =========================================================-->
+<!--           CONVERSATION MANAGEMENT-->
+<!--        ========================================================= */-->
+
+<!--        function ensureConversation(-->
+<!--            conversationId,-->
+<!--            userId,-->
+<!--            username,-->
+<!--            displayName-->
+<!--        ) {-->
+
+<!--            if (-->
+<!--                !conversations.has(-->
+<!--                    conversationId-->
+<!--                )-->
+<!--            ) {-->
+
+<!--                conversations.set(-->
+<!--                    conversationId,-->
+<!--                    {-->
+<!--                        id:-->
+<!--                        conversationId,-->
+
+<!--                        userId:-->
+<!--                            userId || null,-->
+
+<!--                        username:-->
+<!--                            username || "",-->
+
+<!--                        displayName:-->
+<!--                            displayName || "",-->
+
+<!--                        messages:-->
+<!--                            []-->
+<!--                    }-->
+<!--                );-->
+
+<!--            } else {-->
+
+<!--                const conversation =-->
+<!--                    conversations.get(-->
+<!--                        conversationId-->
+<!--                    );-->
+
+<!--                if (userId) {-->
+<!--                    conversation.userId =-->
+<!--                        userId;-->
+<!--                }-->
+
+<!--                if (username) {-->
+<!--                    conversation.username =-->
+<!--                        username;-->
+<!--                }-->
+
+<!--                if (displayName) {-->
+<!--                    conversation.displayName =-->
+<!--                        displayName;-->
+<!--                }-->
+<!--            }-->
+
+
+<!--            return conversations.get(-->
+<!--                conversationId-->
+<!--            );-->
+<!--        }-->
+
+
+<!--        async function openConversation(-->
+<!--            user-->
+<!--        ) {-->
+
+<!--            const otherUserId =-->
+<!--                user.id;-->
+
+<!--            const otherUsername =-->
+<!--                user.username ||-->
+<!--                user.userName;-->
+
+<!--            const displayName =-->
+<!--                user.displayName || "";-->
+
+
+<!--            if (-->
+<!--                !otherUserId ||-->
+<!--                !otherUsername-->
+<!--            ) {-->
+
+<!--                debug(-->
+<!--                    "Selected user does not contain id/username.",-->
+<!--                    true-->
+<!--                );-->
+
+<!--                return;-->
+<!--            }-->
+
+
+<!--            if (-->
+<!--                String(otherUserId) ===-->
+<!--                String(currentUserId)-->
+<!--            ) {-->
+
+<!--                debug(-->
+<!--                    "Cannot start a chat with yourself.",-->
+<!--                    true-->
+<!--                );-->
+
+<!--                return;-->
+<!--            }-->
+
+
+<!--            if (!isConnected) {-->
+
+<!--                debug(-->
+<!--                    "Connect to chat before opening a conversation.",-->
+<!--                    true-->
+<!--                );-->
+
+<!--                return;-->
+<!--            }-->
+
+
+<!--            clearReplyingTo();-->
+
+
+<!--            try {-->
+
+<!--                debug(-->
+<!--                    "Getting conversation with " +-->
+<!--                    otherUsername +-->
+<!--                    "..."-->
+<!--                );-->
+
+
+<!--                const response =-->
+<!--                    await fetch(-->
+<!--                        API_BASE_URL +-->
+<!--                        DIRECT_CONVERSATION_ENDPOINT +-->
+<!--                        "/" +-->
+<!--                        encodeURIComponent(-->
+<!--                            otherUserId-->
+<!--                        ),-->
+<!--                        {-->
+<!--                            method: "POST",-->
+<!--                            headers:-->
+<!--                                authHeaders()-->
+<!--                        }-->
+<!--                    );-->
+
+
+<!--                if (!response.ok) {-->
+
+<!--                    throw new Error(-->
+<!--                        "Conversation request failed (" +-->
+<!--                        response.status +-->
+<!--                        ") " +-->
+<!--                        await response.text()-->
+<!--                            .catch(() => "")-->
+<!--                    );-->
+<!--                }-->
+
+
+<!--                const conversation =-->
+<!--                    await response.json();-->
+
+<!--                const conversationId =-->
+<!--                    conversation.id;-->
+
+
+<!--                if (!conversationId) {-->
+
+<!--                    throw new Error(-->
+<!--                        "Backend did not return conversation id."-->
+<!--                    );-->
+<!--                }-->
+
+
+<!--                ensureConversation(-->
+<!--                    conversationId,-->
+<!--                    otherUserId,-->
+<!--                    otherUsername,-->
+<!--                    displayName-->
+<!--                );-->
+
+
+<!--                activeConversationId =-->
+<!--                    conversationId;-->
+
+<!--                activeOtherUserId =-->
+<!--                    otherUserId;-->
+
+
+<!--                renderConversationList();-->
+
+<!--                showChatArea(-->
+<!--                    otherUsername-->
+<!--                );-->
+
+
+<!--                await loadPresence(-->
+<!--                    otherUserId-->
+<!--                );-->
+
+
+<!--                if (presenceTimer) {-->
+
+<!--                    clearInterval(-->
+<!--                        presenceTimer-->
+<!--                    );-->
+<!--                }-->
+
+
+<!--                presenceTimer =-->
+<!--                    setInterval(-->
+<!--                        function () {-->
+
+<!--                            loadPresence(-->
+<!--                                otherUserId-->
+<!--                            );-->
+
+<!--                        },-->
+<!--                        5000-->
+<!--                    );-->
+
+
+<!--                /*-->
+<!--                 * Load history first.-->
+<!--                 */-->
+
+<!--                await loadMessageHistory(-->
+<!--                    conversationId-->
+<!--                );-->
+
+
+<!--                renderMessages();-->
+
+
+<!--                /*-->
+<!--                 * IMPORTANT:-->
+<!--                 *-->
+<!--                 * Once the chat is opened, mark-->
+<!--                 * every RECEIVED historical message-->
+<!--                 * that isn't already READ as READ.-->
+<!--                 *-->
+<!--                 * Own messages are never marked READ-->
+<!--                 * from this side. This is the ONLY-->
+<!--                 * bulk read-marking path - opening a-->
+<!--                 * conversation is what triggers it,-->
+<!--                 * not connecting the socket.-->
+<!--                 */-->
+
+<!--                const activeConversation =-->
+<!--                    conversations.get(-->
+<!--                        conversationId-->
+<!--                    );-->
+
+
+<!--                if (activeConversation) {-->
+
+<!--                    activeConversation.messages-->
+<!--                        .forEach(function (message) {-->
+
+<!--                            if (-->
+<!--                                message.id &&-->
+<!--                                message.senderUsername !==-->
+<!--                                currentUsername &&-->
+<!--                                message.status !== "READ"-->
+<!--                            ) {-->
+
+<!--                                markMessageAsRead(-->
+<!--                                    conversationId,-->
+<!--                                    message.id-->
+<!--                                );-->
+<!--                            }-->
+<!--                        });-->
+<!--                }-->
+
+
+<!--                if (relativeTimeTimer) {-->
+
+<!--                    clearInterval(-->
+<!--                        relativeTimeTimer-->
+<!--                    );-->
+<!--                }-->
+
+
+<!--                relativeTimeTimer =-->
+<!--                    setInterval(-->
+<!--                        renderMessages,-->
+<!--                        10000-->
+<!--                    );-->
+
+
+<!--                messageInput.focus();-->
+
+<!--            } catch (error) {-->
+
+<!--                debug(-->
+<!--                    "Conversation error: " +-->
+<!--                    error.message,-->
+<!--                    true-->
+<!--                );-->
+<!--            }-->
+<!--        }-->
+
+
+<!--        /* =========================================================-->
+<!--           MESSAGE HISTORY-->
+<!--        ========================================================= */-->
+
+<!--        async function loadMessageHistory(-->
+<!--            conversationId-->
+<!--        ) {-->
+
+<!--            try {-->
+
+<!--                const response =-->
+<!--                    await fetch(-->
+<!--                        API_BASE_URL +-->
+<!--                        MESSAGE_HISTORY_ENDPOINT +-->
+<!--                        "/" +-->
+<!--                        encodeURIComponent(-->
+<!--                            conversationId-->
+<!--                        ) +-->
+<!--                        "/messages",-->
+<!--                        {-->
+<!--                            headers:-->
+<!--                                authHeaders()-->
+<!--                        }-->
+<!--                    );-->
+
+
+<!--                if (!response.ok) {-->
+
+<!--                    debug(-->
+<!--                        "History unavailable (" +-->
+<!--                        response.status +-->
+<!--                        "). Live chat can still work.",-->
+<!--                        true-->
+<!--                    );-->
+
+<!--                    return;-->
+<!--                }-->
+
+
+<!--                const history =-->
+<!--                    await response.json();-->
+
+
+<!--                const conversation =-->
+<!--                    conversations.get(-->
+<!--                        conversationId-->
+<!--                    );-->
+
+
+<!--                if (!conversation) {-->
+<!--                    return;-->
+<!--                }-->
+
+
+<!--                conversation.messages =-->
+<!--                    Array.isArray(history)-->
+<!--                        ? history.map(-->
+<!--                            function (message) {-->
+
+<!--                                const status =-->
+<!--                                    String(-->
+<!--                                        message.status ||-->
+<!--                                        "SENT"-->
+<!--                                    ).toUpperCase();-->
+
+
+<!--                                return {-->
+
+<!--                                    id:-->
+<!--                                        message.messageId ||-->
+<!--                                        message.id ||-->
+<!--                                        null,-->
+
+<!--                                    senderUsername:-->
+<!--                                        message.senderUserName ||-->
+<!--                                        message.senderUsername ||-->
+<!--                                        message.sender ||-->
+<!--                                        "unknown",-->
+
+<!--                                    content:-->
+<!--                                        message.content ||-->
+<!--                                        "",-->
+
+<!--                                    createdAt:-->
+<!--                                        message.createdAt ||-->
+<!--                                        new Date().toISOString(),-->
+
+<!--                                    status:-->
+<!--                                        status === "READ"-->
+<!--                                            ? "READ"-->
+<!--                                            : "SENT",-->
+
+<!--                                    statusUpdatedAt:-->
+<!--                                        message.statusUpdatedAt ||-->
+<!--                                        message.createdAt ||-->
+<!--                                        new Date().toISOString(),-->
+
+<!--                                    pending:-->
+<!--                                        false,-->
+
+<!--                                    messageType:-->
+<!--                                        message.messageType ||-->
+<!--                                        "TEXT",-->
+
+<!--                                    fileName:-->
+<!--                                        message.fileName ||-->
+<!--                                        null,-->
+
+<!--                                    fileUrl:-->
+<!--                                        message.fileUrl ||-->
+<!--                                        null,-->
+
+<!--                                    fileType:-->
+<!--                                        message.fileType ||-->
+<!--                                        null,-->
+
+<!--                                    fileSize:-->
+<!--                                        message.fileSize ||-->
+<!--                                        null,-->
+
+<!--                                    replyToMessageId:-->
+<!--                                        message.replyToMessageId ||-->
+<!--                                        null,-->
+
+<!--                                    replyToContent:-->
+<!--                                        message.replyToContent ||-->
+<!--                                        null,-->
+
+<!--                                    replyToSenderUserName:-->
+<!--                                        message.replyToSenderUserName ||-->
+<!--                                        null,-->
+
+<!--                                    replyToMessageType:-->
+<!--                                        message.replyToMessageType ||-->
+<!--                                        null,-->
+
+<!--                                    replyToFileName:-->
+<!--                                        message.replyToFileName ||-->
+<!--                                        null-->
+<!--                                };-->
+<!--                            }-->
+<!--                        )-->
+<!--                        : [];-->
+
+
+<!--                debug(-->
+<!--                    "Loaded " +-->
+<!--                    conversation.messages.length +-->
+<!--                    " historical messages."-->
+<!--                );-->
+
+<!--            } catch (error) {-->
+
+<!--                debug(-->
+<!--                    "Message history unavailable: " +-->
+<!--                    error.message,-->
+<!--                    true-->
+<!--                );-->
+<!--            }-->
+<!--        }-->
+
+
+<!--        /* =========================================================-->
+<!--           CONVERSATION LIST-->
+<!--        ========================================================= */-->
+
+<!--        function renderConversationList() {-->
+
+<!--            conversationListEl.innerHTML =-->
+<!--                "";-->
+
+
+<!--            conversations.forEach(-->
+<!--                function (conversation) {-->
+
+<!--                    const messages =-->
+<!--                        conversation.messages;-->
+
+<!--                    const lastMessage =-->
+<!--                        messages.length > 0-->
+<!--                            ? messages[-->
+<!--                            messages.length - 1-->
+<!--                                ]-->
+<!--                            : null;-->
+
+
+<!--                    const item =-->
+<!--                        document.createElement("div");-->
+
+<!--                    item.className =-->
+<!--                        "list-item" +-->
+<!--                        (-->
+<!--                            conversation.id ===-->
+<!--                            activeConversationId-->
+<!--                                ? " active"-->
+<!--                                : ""-->
+<!--                        );-->
+
+
+<!--                    const name =-->
+<!--                        document.createElement("div");-->
+
+<!--                    name.className =-->
+<!--                        "name";-->
+
+<!--                    name.textContent =-->
+<!--                        conversation.username ||-->
+<!--                        "Conversation";-->
+
+
+<!--                    const sub =-->
+<!--                        document.createElement("div");-->
+
+<!--                    sub.className =-->
+<!--                        "sub";-->
+
+<!--                    sub.textContent =-->
+<!--                        lastMessage-->
+<!--                            ? "Last message: " +-->
+<!--                            lastMessagePreview(lastMessage)-->
+<!--                            : "No messages yet";-->
+
+
+<!--                    item.appendChild(name);-->
+<!--                    item.appendChild(sub);-->
+
+
+<!--                    /*-->
+<!--                     * If the conversation was created from-->
+<!--                     * an incoming message and userId is not-->
+<!--                     * known, do not attempt to open it.-->
+<!--                     *-->
+<!--                     * Normally existing chats have userId.-->
+<!--                     */-->
+
+<!--                    item.addEventListener(-->
+<!--                        "click",-->
+<!--                        function () {-->
+
+<!--                            if (!conversation.userId) {-->
+
+<!--                                debug(-->
+<!--                                    "This conversation does not have the other user's id.",-->
+<!--                                    true-->
+<!--                                );-->
+
+<!--                                return;-->
+<!--                            }-->
+
+
+<!--                            openConversation({-->
+<!--                                id:-->
+<!--                                conversation.userId,-->
+
+<!--                                username:-->
+<!--                                conversation.username,-->
+
+<!--                                displayName:-->
+<!--                                conversation.displayName-->
+<!--                            });-->
+<!--                        }-->
+<!--                    );-->
+
+
+<!--                    conversationListEl.appendChild(-->
+<!--                        item-->
+<!--                    );-->
+<!--                }-->
+<!--            );-->
+<!--        }-->
+
+
+<!--        function lastMessagePreview(message) {-->
+
+<!--            if (-->
+<!--                message.messageType === "FILE"-->
+<!--            ) {-->
+
+<!--                return (-->
+<!--                    "\u{1F4CE} " +-->
+<!--                    (-->
+<!--                        message.fileName ||-->
+<!--                        "Attachment"-->
+<!--                    )-->
+<!--                );-->
+<!--            }-->
+
+<!--            return message.content;-->
+<!--        }-->
+
+
+<!--        /* =========================================================-->
+<!--           PRESENCE-->
+<!--        ========================================================= */-->
+
+<!--        async function loadPresence(-->
+<!--            userId-->
+<!--        ) {-->
+
+<!--            if (!userId) {-->
+<!--                return;-->
+<!--            }-->
+
+
+<!--            try {-->
+
+<!--                const response =-->
+<!--                    await fetch(-->
+<!--                        API_BASE_URL +-->
+<!--                        PRESENCE_ENDPOINT +-->
+<!--                        "/" +-->
+<!--                        encodeURIComponent(-->
+<!--                            userId-->
+<!--                        ) +-->
+<!--                        "/presence",-->
+<!--                        {-->
+<!--                            headers:-->
+<!--                                authHeaders()-->
+<!--                        }-->
+<!--                    );-->
+
+
+<!--                if (!response.ok) {-->
+
+<!--                    presenceIndicatorEl.textContent =-->
+<!--                        "Presence unavailable";-->
+
+<!--                    presenceIndicatorEl.className =-->
+<!--                        "offline";-->
+
+<!--                    return;-->
+<!--                }-->
+
+
+<!--                const data =-->
+<!--                    await response.json();-->
+
+
+<!--                if (data.online === true) {-->
+
+<!--                    presenceIndicatorEl.textContent =-->
+<!--                        "Online";-->
+
+<!--                    presenceIndicatorEl.className =-->
+<!--                        "online";-->
+
+<!--                } else {-->
+
+<!--                    presenceIndicatorEl.textContent =-->
+<!--                        "Offline";-->
+
+<!--                    presenceIndicatorEl.className =-->
+<!--                        "offline";-->
+<!--                }-->
+
+<!--            } catch (error) {-->
+
+<!--                presenceIndicatorEl.textContent =-->
+<!--                    "Presence unavailable";-->
+
+<!--                presenceIndicatorEl.className =-->
+<!--                    "offline";-->
+<!--            }-->
+<!--        }-->
+
+
+<!--        /* =========================================================-->
+<!--           READ RECEIPTS-->
+<!--        ========================================================= */-->
+
+<!--        /*-->
+<!--         * Sends a single READ event over STOMP for one message.-->
+<!--         *-->
+<!--         * frontend-->
+<!--         *      -> /app/read-->
+<!--         *      -> ChatController @MessageMapping("/read")-->
+<!--         *      -> ChatService.markMessageAsRead(conversationId, messageId, principal)-->
+<!--         *-->
+<!--         * Body shape must match ReadMessageDTO exactly:-->
+<!--         *   { conversationId: UUID, messageId: UUID }-->
+<!--         *-->
+<!--         * This is NOT an HTTP call - there is no PUT/POST here,-->
+<!--         * only a STOMP publish to READ_DESTINATION.-->
+<!--         */-->
+<!--        function markMessageAsRead(-->
+<!--            conversationId,-->
+<!--            messageId-->
+<!--        ) {-->
+
+<!--            if (-->
+<!--                !isConnected ||-->
+<!--                !stompClient-->
+<!--            ) {-->
+
+<!--                debug(-->
+<!--                    "Cannot send READ - not connected.",-->
+<!--                    true-->
+<!--                );-->
+
+<!--                return;-->
+<!--            }-->
+
+
+<!--            if (-->
+<!--                !conversationId ||-->
+<!--                !messageId-->
+<!--            ) {-->
+<!--                return;-->
+<!--            }-->
+
+
+<!--            stompClient.publish({-->
+
+<!--                destination:-->
+<!--                READ_DESTINATION,-->
+
+<!--                body:-->
+<!--                    JSON.stringify({-->
+
+<!--                        conversationId:-->
+<!--                        conversationId,-->
+
+<!--                        messageId:-->
+<!--                        messageId-->
+<!--                    })-->
+<!--            });-->
+
+
+<!--            debug(-->
+<!--                "READ sent for message " +-->
+<!--                messageId-->
+<!--            );-->
+<!--        }-->
+
+
+<!--        /* =========================================================-->
+<!--           CHAT AREA-->
+<!--        ========================================================= */-->
+
+<!--        function showChatArea(-->
+<!--            otherUsername-->
+<!--        ) {-->
+
+<!--            noConversationEl.classList.add(-->
+<!--                "hidden"-->
+<!--            );-->
+
+<!--            chatHeaderEl.classList.remove(-->
+<!--                "hidden"-->
+<!--            );-->
+
+<!--            messagesEl.classList.remove(-->
+<!--                "hidden"-->
+<!--            );-->
+
+<!--            messageInputRow.classList.remove(-->
+<!--                "hidden"-->
+<!--            );-->
+
+
+<!--            chatUserNameEl.textContent =-->
+<!--                "Chat with " +-->
+<!--                otherUsername;-->
+
+
+<!--            presenceIndicatorEl.textContent =-->
+<!--                "Checking...";-->
+
+<!--            presenceIndicatorEl.className = "";-->
+<!--        }-->
+
+
+<!--        function resetChatArea() {-->
+
+<!--            noConversationEl.classList.remove(-->
+<!--                "hidden"-->
+<!--            );-->
+
+<!--            chatHeaderEl.classList.add(-->
+<!--                "hidden"-->
+<!--            );-->
+
+<!--            messagesEl.classList.add(-->
+<!--                "hidden"-->
+<!--            );-->
+
+<!--            messageInputRow.classList.add(-->
+<!--                "hidden"-->
+<!--            );-->
+
+
+<!--            messagesEl.innerHTML =-->
+<!--                "";-->
+
+<!--            chatUserNameEl.textContent =-->
+<!--                "";-->
+
+<!--            presenceIndicatorEl.textContent =-->
+<!--                "";-->
+
+<!--            activeConversationId =-->
+<!--                null;-->
+
+<!--            activeOtherUserId =-->
+<!--                null;-->
+
+<!--            clearReplyingTo();-->
+
+
+<!--            if (presenceTimer) {-->
+
+<!--                clearInterval(-->
+<!--                    presenceTimer-->
+<!--                );-->
+
+<!--                presenceTimer =-->
+<!--                    null;-->
+<!--            }-->
+
+
+<!--            if (relativeTimeTimer) {-->
+
+<!--                clearInterval(-->
+<!--                    relativeTimeTimer-->
+<!--                );-->
+
+<!--                relativeTimeTimer =-->
+<!--                    null;-->
+<!--            }-->
+<!--        }-->
+
+
+<!--        /* =========================================================-->
+<!--           REPLY FUNCTIONALITY-->
+<!--        ========================================================= */-->
+
+<!--        /*-->
+<!--         * Returns a compact { icon, label } description for any-->
+<!--         * message (or reply-summary fields), used both in the-->
+<!--         * composer reply preview and in the in-bubble quoted-->
+<!--         * section. Never renders the full media - text/icon +-->
+<!--         * filename only, per spec.-->
+<!--         */-->
+<!--        function describeForReply(-->
+<!--            messageType,-->
+<!--            content,-->
+<!--            fileName,-->
+<!--            fileType-->
+<!--        ) {-->
+
+<!--            if (messageType !== "FILE") {-->
+
+<!--                return {-->
+<!--                    icon: null,-->
+<!--                    label: content || ""-->
+<!--                };-->
+<!--            }-->
+
+<!--            const type =-->
+<!--                fileType || "";-->
+
+<!--            if (type.startsWith("image/")) {-->
+
+<!--                return {-->
+<!--                    icon: "\u{1F4F7}",-->
+<!--                    label: fileName || "Photo"-->
+<!--                };-->
+<!--            }-->
+
+<!--            if (type.startsWith("video/")) {-->
+
+<!--                return {-->
+<!--                    icon: "\u{1F3A5}",-->
+<!--                    label: fileName || "Video"-->
+<!--                };-->
+<!--            }-->
+
+<!--            return {-->
+<!--                icon: "\u{1F4CE}",-->
+<!--                label: fileName || "File"-->
+<!--            };-->
+<!--        }-->
+
+
+<!--        function setReplyingTo(message) {-->
+
+<!--            replyingTo = {-->
+
+<!--                messageId:-->
+<!--                message.id,-->
+
+<!--                senderUsername:-->
+<!--                message.senderUsername,-->
+
+<!--                messageType:-->
+<!--                    message.messageType || "TEXT",-->
+
+<!--                content:-->
+<!--                    message.content || "",-->
+
+<!--                fileName:-->
+<!--                    message.fileName || null,-->
+
+<!--                fileType:-->
+<!--                    message.fileType || null-->
+<!--            };-->
+
+<!--            renderReplyPreviewBar();-->
+
+<!--            messageInput.focus();-->
+<!--        }-->
+
+
+<!--        function clearReplyingTo() {-->
+
+<!--            replyingTo = null;-->
+
+<!--            renderReplyPreviewBar();-->
+<!--        }-->
+
+
+<!--        function renderReplyPreviewBar() {-->
+
+<!--            if (!replyingTo) {-->
+
+<!--                replyPreviewBar.classList.add(-->
+<!--                    "hidden"-->
+<!--                );-->
+
+<!--                replyPreviewContent.innerHTML =-->
+<!--                    "";-->
+
+<!--                return;-->
+<!--            }-->
+
+
+<!--            replyPreviewBar.classList.remove(-->
+<!--                "hidden"-->
+<!--            );-->
+
+<!--            replyPreviewContent.innerHTML =-->
+<!--                "";-->
+
+
+<!--            const label =-->
+<!--                document.createElement("div");-->
+
+<!--            label.className =-->
+<!--                "reply-to-label";-->
+
+<!--            label.textContent =-->
+<!--                "Replying to " +-->
+<!--                replyingTo.senderUsername;-->
+
+
+<!--            const body =-->
+<!--                document.createElement("div");-->
+
+<!--            body.className =-->
+<!--                "reply-to-body";-->
+
+
+<!--            const described =-->
+<!--                describeForReply(-->
+<!--                    replyingTo.messageType,-->
+<!--                    replyingTo.content,-->
+<!--                    replyingTo.fileName,-->
+<!--                    replyingTo.fileType-->
+<!--                );-->
+
+
+<!--            const cachedThumb =-->
+<!--                replyingTo.messageId-->
+<!--                    ? fileBlobCache.get(-->
+<!--                        replyingTo.messageId-->
+<!--                    )-->
+<!--                    : null;-->
+
+
+<!--            if (-->
+<!--                described.icon === "\u{1F4F7}" &&-->
+<!--                cachedThumb-->
+<!--            ) {-->
+
+<!--                const img =-->
+<!--                    document.createElement("img");-->
+
+<!--                img.src = cachedThumb;-->
+
+<!--                body.appendChild(img);-->
+
+<!--            } else if (described.icon) {-->
+
+<!--                const icon =-->
+<!--                    document.createElement("span");-->
+
+<!--                icon.textContent =-->
+<!--                    described.icon;-->
+
+<!--                body.appendChild(icon);-->
+<!--            }-->
+
+
+<!--            const text =-->
+<!--                document.createElement("span");-->
+
+<!--            text.textContent =-->
+<!--                described.label;-->
+
+<!--            body.appendChild(text);-->
+
+
+<!--            replyPreviewContent.appendChild(-->
+<!--                label-->
+<!--            );-->
+
+<!--            replyPreviewContent.appendChild(-->
+<!--                body-->
+<!--            );-->
+<!--        }-->
+
+
+<!--        function buildReplyQuoteElement(message) {-->
+
+<!--            const quote =-->
+<!--                document.createElement("div");-->
+
+<!--            quote.className =-->
+<!--                "reply-quote";-->
+
+
+<!--            const sender =-->
+<!--                document.createElement("div");-->
+
+<!--            sender.className =-->
+<!--                "reply-quote-sender";-->
+
+<!--            sender.textContent =-->
+<!--                "\u21B3 " +-->
+<!--                (-->
+<!--                    message.replyToSenderUserName ||-->
+<!--                    ""-->
+<!--                );-->
+
+
+<!--            const body =-->
+<!--                document.createElement("div");-->
+
+<!--            body.className =-->
+<!--                "reply-quote-body";-->
+
+
+<!--            const described =-->
+<!--                describeForReply(-->
+<!--                    message.replyToMessageType,-->
+<!--                    message.replyToContent,-->
+<!--                    message.replyToFileName,-->
+<!--                    null-->
+<!--                );-->
+
+
+<!--            if (described.icon) {-->
+
+<!--                const icon =-->
+<!--                    document.createElement("span");-->
+
+<!--                icon.textContent =-->
+<!--                    described.icon;-->
+
+<!--                body.appendChild(icon);-->
+<!--            }-->
+
+
+<!--            const text =-->
+<!--                document.createElement("span");-->
+
+<!--            text.textContent =-->
+<!--                described.label;-->
+
+<!--            body.appendChild(text);-->
+
+
+<!--            quote.appendChild(sender);-->
+<!--            quote.appendChild(body);-->
+
+
+<!--            quote.addEventListener(-->
+<!--                "click",-->
+<!--                function () {-->
+
+<!--                    scrollToAndHighlightMessage(-->
+<!--                        message.replyToMessageId-->
+<!--                    );-->
+<!--                }-->
+<!--            );-->
+
+
+<!--            return quote;-->
+<!--        }-->
+
+
+<!--        function scrollToAndHighlightMessage(messageId) {-->
+
+<!--            if (!messageId) {-->
+<!--                return;-->
+<!--            }-->
+
+<!--            const target =-->
+<!--                messagesEl.querySelector(-->
+<!--                    '[data-message-id="' +-->
+<!--                    CSS.escape(String(messageId)) +-->
+<!--                    '"]'-->
+<!--                );-->
+
+<!--            if (!target) {-->
+
+<!--                debug(-->
+<!--                    "Original message not currently loaded.",-->
+<!--                    true-->
+<!--                );-->
+
+<!--                return;-->
+<!--            }-->
+
+<!--            target.scrollIntoView({-->
+<!--                behavior: "smooth",-->
+<!--                block: "center"-->
+<!--            });-->
+
+<!--            target.classList.remove(-->
+<!--                "highlight"-->
+<!--            );-->
+
+<!--            void target.offsetWidth;-->
+
+<!--            target.classList.add(-->
+<!--                "highlight"-->
+<!--            );-->
+
+<!--            setTimeout(-->
+<!--                function () {-->
+
+<!--                    target.classList.remove(-->
+<!--                        "highlight"-->
+<!--                    );-->
+<!--                },-->
+<!--                1400-->
+<!--            );-->
+<!--        }-->
+
+
+<!--        replyPreviewCancelBtn.addEventListener(-->
+<!--            "click",-->
+<!--            clearReplyingTo-->
+<!--        );-->
+
+
+<!--        messageInput.addEventListener(-->
+<!--            "keydown",-->
+<!--            function (event) {-->
+
+<!--                if (-->
+<!--                    event.key === "Escape" &&-->
+<!--                    replyingTo-->
+<!--                ) {-->
+
+<!--                    clearReplyingTo();-->
+<!--                }-->
+<!--            }-->
+<!--        );-->
+
+
+<!--        /* =========================================================-->
+<!--           MESSAGE RENDERING-->
+<!--        ========================================================= */-->
+
+<!--        function renderMessages() {-->
+
+<!--            const conversation =-->
+<!--                conversations.get(-->
+<!--                    activeConversationId-->
+<!--                );-->
+
+
+<!--            if (!conversation) {-->
+<!--                return;-->
+<!--            }-->
+
+
+<!--            messagesEl.innerHTML =-->
+<!--                "";-->
+
+
+<!--            let lastDateKey =-->
+<!--                null;-->
+
+
+<!--            conversation.messages.forEach(-->
+<!--                function (message) {-->
+
+<!--                    const date =-->
+<!--                        new Date(-->
+<!--                            message.createdAt-->
+<!--                        );-->
+
+
+<!--                    /*-->
+<!--                     * Date separator.-->
+<!--                     */-->
+
+<!--                    if (-->
+<!--                        !Number.isNaN(-->
+<!--                            date.getTime()-->
+<!--                        )-->
+<!--                    ) {-->
+
+<!--                        const dateKey =-->
+<!--                            date.toLocaleDateString();-->
+
+
+<!--                        if (-->
+<!--                            dateKey !==-->
+<!--                            lastDateKey-->
+<!--                        ) {-->
+
+<!--                            const separator =-->
+<!--                                document.createElement(-->
+<!--                                    "div"-->
+<!--                                );-->
+
+<!--                            separator.className =-->
+<!--                                "time-separator";-->
+
+<!--                            separator.textContent =-->
+<!--                                formatDateSeparator(-->
+<!--                                    message.createdAt-->
+<!--                                );-->
+
+<!--                            messagesEl.appendChild(-->
+<!--                                separator-->
+<!--                            );-->
+
+<!--                            lastDateKey =-->
+<!--                                dateKey;-->
+<!--                        }-->
+<!--                    }-->
+
+
+<!--                    const isOwn =-->
+<!--                        message.senderUsername ===-->
+<!--                        currentUsername;-->
+
+
+<!--                    const bubble =-->
+<!--                        document.createElement(-->
+<!--                            "div"-->
+<!--                        );-->
+
+<!--                    bubble.className =-->
+<!--                        "msg" +-->
+<!--                        (-->
+<!--                            isOwn-->
+<!--                                ? " own"-->
+<!--                                : ""-->
+<!--                        );-->
+
+<!--                    if (message.id) {-->
+
+<!--                        bubble.setAttribute(-->
+<!--                            "data-message-id",-->
+<!--                            String(message.id)-->
+<!--                        );-->
+<!--                    }-->
+
+
+<!--                    const sender =-->
+<!--                        document.createElement(-->
+<!--                            "div"-->
+<!--                        );-->
+
+<!--                    sender.className =-->
+<!--                        "sender";-->
+
+<!--                    sender.textContent =-->
+<!--                        message.senderUsername;-->
+
+
+<!--                    bubble.appendChild(-->
+<!--                        sender-->
+<!--                    );-->
+
+
+<!--                    if (message.replyToMessageId) {-->
+
+<!--                        bubble.appendChild(-->
+<!--                            buildReplyQuoteElement(-->
+<!--                                message-->
+<!--                            )-->
+<!--                        );-->
+<!--                    }-->
+
+
+<!--                    if (message.id) {-->
+
+<!--                        const replyBtn =-->
+<!--                            document.createElement(-->
+<!--                                "button"-->
+<!--                            );-->
+
+<!--                        replyBtn.className =-->
+<!--                            "reply-btn";-->
+
+<!--                        replyBtn.type =-->
+<!--                            "button";-->
+
+<!--                        replyBtn.textContent =-->
+<!--                            "\u21A9";-->
+
+<!--                        replyBtn.title =-->
+<!--                            "Reply";-->
+
+<!--                        replyBtn.addEventListener(-->
+<!--                            "click",-->
+<!--                            function () {-->
+
+<!--                                setReplyingTo(-->
+<!--                                    message-->
+<!--                                );-->
+<!--                            }-->
+<!--                        );-->
+
+<!--                        bubble.appendChild(-->
+<!--                            replyBtn-->
+<!--                        );-->
+<!--                    }-->
+
+
+<!--                    /*-->
+<!--                     * FILE messages render the attachment-->
+<!--                     * (image / video / download link) via-->
+<!--                     * buildFileBubbleContent(). An optional-->
+<!--                     * caption is shown underneath it.-->
+<!--                     *-->
+<!--                     * TEXT messages render as plain content,-->
+<!--                     * exactly as before.-->
+<!--                     */-->
+
+<!--                    if (-->
+<!--                        message.messageType === "FILE"-->
+<!--                    ) {-->
+
+<!--                        const fileContent =-->
+<!--                            buildFileBubbleContent(-->
+<!--                                message-->
+<!--                            );-->
+
+<!--                        bubble.appendChild(-->
+<!--                            fileContent-->
+<!--                        );-->
+
+<!--                        if (message.content) {-->
+
+<!--                            const caption =-->
+<!--                                document.createElement(-->
+<!--                                    "div"-->
+<!--                                );-->
+
+<!--                            caption.className =-->
+<!--                                "content";-->
+
+<!--                            caption.textContent =-->
+<!--                                message.content;-->
+
+<!--                            bubble.appendChild(-->
+<!--                                caption-->
+<!--                            );-->
+<!--                        }-->
+
+<!--                    } else {-->
+
+<!--                        const content =-->
+<!--                            document.createElement(-->
+<!--                                "div"-->
+<!--                            );-->
+
+<!--                        content.className =-->
+<!--                            "content";-->
+
+<!--                        content.textContent =-->
+<!--                            message.content;-->
+
+<!--                        bubble.appendChild(-->
+<!--                            content-->
+<!--                        );-->
+<!--                    }-->
+
+
+<!--                    /*-->
+<!--                     * Only own messages show-->
+<!--                     * Sent / Seen.-->
+<!--                     */-->
+
+<!--                    if (isOwn) {-->
+
+<!--                        const meta =-->
+<!--                            document.createElement(-->
+<!--                                "div"-->
+<!--                            );-->
+
+<!--                        meta.className =-->
+<!--                            "message-meta";-->
+
+
+<!--                        const status =-->
+<!--                            document.createElement(-->
+<!--                                "span"-->
+<!--                            );-->
+
+<!--                        status.className =-->
+<!--                            "message-status";-->
+
+<!--                        status.textContent =-->
+<!--                            formatMessageStatus(-->
+<!--                                message.status,-->
+<!--                                message.statusUpdatedAt-->
+<!--                            );-->
+
+
+<!--                        meta.appendChild(-->
+<!--                            status-->
+<!--                        );-->
+
+<!--                        bubble.appendChild(-->
+<!--                            meta-->
+<!--                        );-->
+<!--                    }-->
+
+
+<!--                    const hoverTime =-->
+<!--                        document.createElement(-->
+<!--                            "span"-->
+<!--                        );-->
+
+<!--                    hoverTime.className =-->
+<!--                        "message-time-hover";-->
+
+<!--                    hoverTime.textContent =-->
+<!--                        formatExactDateTime(-->
+<!--                            message.createdAt-->
+<!--                        );-->
+
+
+<!--                    bubble.appendChild(-->
+<!--                        hoverTime-->
+<!--                    );-->
+
+
+<!--                    messagesEl.appendChild(-->
+<!--                        bubble-->
+<!--                    );-->
+<!--                }-->
+<!--            );-->
+
+
+<!--            messagesEl.scrollTop =-->
+<!--                messagesEl.scrollHeight;-->
+<!--        }-->
+
+
+<!--        /* =========================================================-->
+<!--           TIME FORMATTING-->
+<!--        ========================================================= */-->
+
+<!--        function formatMessageStatus(-->
+<!--            status,-->
+<!--            statusUpdatedAt-->
+<!--        ) {-->
+
+<!--            const normalized =-->
+<!--                String(-->
+<!--                    status || "SENT"-->
+<!--                ).toUpperCase();-->
+
+
+<!--            if (normalized === "READ") {-->
+
+<!--                return (-->
+<!--                    "Seen " +-->
+<!--                    relativeTime(-->
+<!--                        statusUpdatedAt-->
+<!--                    )-->
+<!--                );-->
+<!--            }-->
+
+
+<!--            return (-->
+<!--                "Sent " +-->
+<!--                relativeTime(-->
+<!--                    statusUpdatedAt-->
+<!--                )-->
+<!--            );-->
+<!--        }-->
+
+
+<!--        function relativeTime(-->
+<!--            value-->
+<!--        ) {-->
+
+<!--            const date =-->
+<!--                new Date(value);-->
+
+
+<!--            if (-->
+<!--                Number.isNaN(-->
+<!--                    date.getTime()-->
+<!--                )-->
+<!--            ) {-->
+<!--                return "";-->
+<!--            }-->
+
+
+<!--            const seconds =-->
+<!--                Math.max(-->
+<!--                    0,-->
+<!--                    Math.floor(-->
+<!--                        (-->
+<!--                            Date.now() - -->
+<!--                            date.getTime()-->
+<!--                        ) / 1000-->
+<!--                    )-->
+<!--                );-->
+
+
+<!--            if (seconds < 60) {-->
+<!--                return "just now";-->
+<!--            }-->
+
+
+<!--            const minutes =-->
+<!--                Math.floor(-->
+<!--                    seconds / 60-->
+<!--                );-->
+
+
+<!--            if (minutes < 60) {-->
+
+<!--                return (-->
+<!--                    minutes === 1-->
+<!--                        ? "1 min ago"-->
+<!--                        : minutes + " min ago"-->
+<!--                );-->
+<!--            }-->
+
+
+<!--            const hours =-->
+<!--                Math.floor(-->
+<!--                    minutes / 60-->
+<!--                );-->
+
+
+<!--            if (hours < 24) {-->
+
+<!--                return (-->
+<!--                    hours === 1-->
+<!--                        ? "1 hr ago"-->
+<!--                        : hours + " hrs ago"-->
+<!--                );-->
+<!--            }-->
+
+
+<!--            const days =-->
+<!--                Math.floor(-->
+<!--                    hours / 24-->
+<!--                );-->
+
+
+<!--            return (-->
+<!--                days === 1-->
+<!--                    ? "1 day ago"-->
+<!--                    : days + " days ago"-->
+<!--            );-->
+<!--        }-->
+
+
+<!--        function formatExactDateTime(-->
+<!--            value-->
+<!--        ) {-->
+
+<!--            const date =-->
+<!--                new Date(value);-->
+
+
+<!--            if (-->
+<!--                Number.isNaN(-->
+<!--                    date.getTime()-->
+<!--                )-->
+<!--            ) {-->
+<!--                return "";-->
+<!--            }-->
+
+
+<!--            return date.toLocaleTimeString(-->
+<!--                [],-->
+<!--                {-->
+<!--                    hour: "2-digit",-->
+<!--                    minute: "2-digit"-->
+<!--                }-->
+<!--            );-->
+<!--        }-->
+
+
+<!--        function formatDateSeparator(-->
+<!--            value-->
+<!--        ) {-->
+
+<!--            const date =-->
+<!--                new Date(value);-->
+
+
+<!--            if (-->
+<!--                Number.isNaN(-->
+<!--                    date.getTime()-->
+<!--                )-->
+<!--            ) {-->
+<!--                return "";-->
+<!--            }-->
+
+
+<!--            return date.toLocaleDateString(-->
+<!--                [],-->
+<!--                {-->
+<!--                    day: "2-digit",-->
+<!--                    month: "short",-->
+<!--                    year: "numeric"-->
+<!--                }-->
+<!--            );-->
+<!--        }-->
+
+
+<!--        /* =========================================================-->
+<!--           FILE SHARING - SELECTION AND PREVIEW-->
+<!--        ========================================================= */-->
+
+<!--        const ALLOWED_EXTENSIONS = [-->
+<!--            "jpg", "jpeg", "png", "webp", "gif",-->
+<!--            "mp4", "webm", "mov",-->
+<!--            "pdf", "doc", "docx", "txt",-->
+<!--            "zip"-->
+<!--        ];-->
+
+<!--        fileInputEl.setAttribute(-->
+<!--            "accept",-->
+<!--            ALLOWED_EXTENSIONS-->
+<!--                .map(function (ext) {-->
+<!--                    return "." + ext;-->
+<!--                })-->
+<!--                .join(",")-->
+<!--        );-->
+
+
+<!--        attachBtn.addEventListener(-->
+<!--            "click",-->
+<!--            function () {-->
+<!--                fileInputEl.click();-->
+<!--            }-->
+<!--        );-->
+
+
+<!--        function getFileExtension(fileName) {-->
+
+<!--            const dotIndex =-->
+<!--                fileName.lastIndexOf(".");-->
+
+<!--            if (dotIndex === -1) {-->
+<!--                return "";-->
+<!--            }-->
+
+<!--            return fileName-->
+<!--                .slice(dotIndex + 1)-->
+<!--                .toLowerCase();-->
+<!--        }-->
+
+
+<!--        fileInputEl.addEventListener(-->
+<!--            "change",-->
+<!--            function () {-->
+
+<!--                const file =-->
+<!--                    fileInputEl.files[0];-->
+
+<!--                if (!file) {-->
+<!--                    return;-->
+<!--                }-->
+
+<!--                const extension =-->
+<!--                    getFileExtension(file.name);-->
+
+<!--                if (-->
+<!--                    ALLOWED_EXTENSIONS.indexOf(-->
+<!--                        extension-->
+<!--                    ) === -1-->
+<!--                ) {-->
+
+<!--                    debug(-->
+<!--                        "Unsupported file type: ." +-->
+<!--                        extension,-->
+<!--                        true-->
+<!--                    );-->
+
+<!--                    fileInputEl.value = "";-->
+
+<!--                    return;-->
+<!--                }-->
+
+<!--                if (file.size > MAX_FILE_SIZE_BYTES) {-->
+
+<!--                    debug(-->
+<!--                        "File too large (max 50MB): " +-->
+<!--                        file.name,-->
+<!--                        true-->
+<!--                    );-->
+
+<!--                    fileInputEl.value = "";-->
+
+<!--                    return;-->
+<!--                }-->
+
+<!--                selectedFile = file;-->
+
+<!--                showFilePreview(file);-->
+<!--            }-->
+<!--        );-->
+
+
+<!--        filePreviewRemoveBtn.addEventListener(-->
+<!--            "click",-->
+<!--            clearFilePreview-->
+<!--        );-->
+
+
+<!--        function showFilePreview(file) {-->
+
+<!--            filePreviewThumb.innerHTML = "";-->
+
+<!--            if (file.type.startsWith("image/")) {-->
+
+<!--                const img =-->
+<!--                    document.createElement("img");-->
+
+<!--                img.src =-->
+<!--                    URL.createObjectURL(file);-->
+
+<!--                filePreviewThumb.appendChild(img);-->
+
+<!--            } else if (file.type.startsWith("video/")) {-->
+
+<!--                const video =-->
+<!--                    document.createElement("video");-->
+
+<!--                video.src =-->
+<!--                    URL.createObjectURL(file);-->
+
+<!--                video.muted = true;-->
+
+<!--                filePreviewThumb.appendChild(video);-->
+
+<!--            } else {-->
+
+<!--                filePreviewThumb.textContent = "\u{1F4CE}";-->
+<!--            }-->
+
+<!--            filePreviewName.textContent =-->
+<!--                file.name;-->
+
+<!--            filePreviewMeta.textContent =-->
+<!--                (file.type || "unknown type") +-->
+<!--                " \u00B7 " +-->
+<!--                formatFileSize(file.size);-->
+
+<!--            filePreviewBar.classList.remove(-->
+<!--                "hidden"-->
+<!--            );-->
+<!--        }-->
+
+
+<!--        function clearFilePreview() {-->
+
+<!--            selectedFile = null;-->
+
+<!--            fileInputEl.value = "";-->
+
+<!--            filePreviewThumb.innerHTML = "";-->
+
+<!--            filePreviewBar.classList.add(-->
+<!--                "hidden"-->
+<!--            );-->
+<!--        }-->
+
+
+<!--        /* =========================================================-->
+<!--           FILE SHARING - UPLOAD-->
+<!--        ========================================================= */-->
+
+<!--        async function sendFileMessage() {-->
+
+<!--            if (!selectedFile) {-->
+<!--                return;-->
+<!--            }-->
+
+<!--            if (!activeConversationId) {-->
+
+<!--                debug(-->
+<!--                    "No conversation selected.",-->
+<!--                    true-->
+<!--                );-->
+
+<!--                return;-->
+<!--            }-->
+
+<!--            const conversation =-->
+<!--                conversations.get(-->
+<!--                    activeConversationId-->
+<!--                );-->
+
+<!--            if (!conversation) {-->
+<!--                return;-->
+<!--            }-->
+
+<!--            const caption =-->
+<!--                messageInput.value.trim();-->
+
+<!--            const outgoingReply =-->
+<!--                replyingTo;-->
+
+<!--            const formData =-->
+<!--                new FormData();-->
+
+<!--            formData.append(-->
+<!--                "file",-->
+<!--                selectedFile-->
+<!--            );-->
+
+<!--            formData.append(-->
+<!--                "conversationId",-->
+<!--                activeConversationId-->
+<!--            );-->
+
+<!--            if (caption) {-->
+<!--                formData.append(-->
+<!--                    "caption",-->
+<!--                    caption-->
+<!--                );-->
+<!--            }-->
+
+<!--            if (outgoingReply) {-->
+<!--                formData.append(-->
+<!--                    "replyToMessageId",-->
+<!--                    outgoingReply.messageId-->
+<!--                );-->
+<!--            }-->
+
+<!--            const fileBeingSent =-->
+<!--                selectedFile;-->
+
+<!--            clearFilePreview();-->
+
+<!--            messageInput.value = "";-->
+
+<!--            clearReplyingTo();-->
+
+
+<!--            try {-->
+
+<!--                debug(-->
+<!--                    "Uploading file: " +-->
+<!--                    fileBeingSent.name-->
+<!--                );-->
+
+<!--                const response =-->
+<!--                    await fetch(-->
+<!--                        API_BASE_URL +-->
+<!--                        FILE_UPLOAD_ENDPOINT,-->
+<!--                        {-->
+<!--                            method: "POST",-->
+<!--                            headers:-->
+<!--                                authHeaders(),-->
+<!--                            body:-->
+<!--                            formData-->
+<!--                        }-->
+<!--                    );-->
+
+<!--                if (!response.ok) {-->
+
+<!--                    throw new Error(-->
+<!--                        "Upload failed (" +-->
+<!--                        response.status +-->
+<!--                        ") " +-->
+<!--                        await response.text()-->
+<!--                            .catch(() => "")-->
+<!--                    );-->
+<!--                }-->
+
+<!--                const saved =-->
+<!--                    await response.json();-->
+
+<!--                const messageId =-->
+<!--                    saved.messageId ||-->
+<!--                    saved.id;-->
+
+<!--                conversation.messages.push({-->
+
+<!--                    id: messageId,-->
+
+<!--                    senderUsername:-->
+<!--                    currentUsername,-->
+
+<!--                    content:-->
+<!--                        saved.content || "",-->
+
+<!--                    createdAt:-->
+<!--                        saved.createdAt ||-->
+<!--                        new Date().toISOString(),-->
+
+<!--                    status:-->
+<!--                        "SENT",-->
+
+<!--                    statusUpdatedAt:-->
+<!--                        new Date().toISOString(),-->
+
+<!--                    pending:-->
+<!--                        false,-->
+
+<!--                    messageType:-->
+<!--                        saved.messageType ||-->
+<!--                        "FILE",-->
+
+<!--                    fileName:-->
+<!--                    saved.fileName,-->
+
+<!--                    fileUrl:-->
+<!--                    saved.fileUrl,-->
+
+<!--                    fileType:-->
+<!--                    saved.fileType,-->
+
+<!--                    fileSize:-->
+<!--                    saved.fileSize,-->
+
+<!--                    replyToMessageId:-->
+<!--                        saved.replyToMessageId ||-->
+<!--                        (-->
+<!--                            outgoingReply-->
+<!--                                ? outgoingReply.messageId-->
+<!--                                : null-->
+<!--                        ),-->
+
+<!--                    replyToSenderUserName:-->
+<!--                        saved.replyToSenderUserName ||-->
+<!--                        (-->
+<!--                            outgoingReply-->
+<!--                                ? outgoingReply.senderUsername-->
+<!--                                : null-->
+<!--                        ),-->
+
+<!--                    replyToContent:-->
+<!--                        saved.replyToContent ||-->
+<!--                        (-->
+<!--                            outgoingReply-->
+<!--                                ? outgoingReply.content-->
+<!--                                : null-->
+<!--                        ),-->
+
+<!--                    replyToMessageType:-->
+<!--                        saved.replyToMessageType ||-->
+<!--                        (-->
+<!--                            outgoingReply-->
+<!--                                ? outgoingReply.messageType-->
+<!--                                : null-->
+<!--                        ),-->
+
+<!--                    replyToFileName:-->
+<!--                        saved.replyToFileName ||-->
+<!--                        (-->
+<!--                            outgoingReply-->
+<!--                                ? outgoingReply.fileName-->
+<!--                                : null-->
+<!--                        )-->
+<!--                });-->
+
+<!--                renderMessages();-->
+<!--                renderConversationList();-->
+
+<!--                debug(-->
+<!--                    "File sent: " +-->
+<!--                    fileBeingSent.name-->
+<!--                );-->
+
+<!--            } catch (error) {-->
+
+<!--                debug(-->
+<!--                    "File upload error: " +-->
+<!--                    error.message,-->
+<!--                    true-->
+<!--                );-->
+<!--            }-->
+<!--        }-->
+
+
+<!--        /* =========================================================-->
+<!--           FILE SHARING - AUTHENTICATED DOWNLOAD / RENDERING-->
+<!--        ========================================================= */-->
+
+<!--        async function getFileBlobUrl(messageId) {-->
+
+<!--            if (fileBlobCache.has(messageId)) {-->
+<!--                return fileBlobCache.get(messageId);-->
+<!--            }-->
+
+<!--            const response =-->
+<!--                await fetch(-->
+<!--                    API_BASE_URL +-->
+<!--                    FILE_DOWNLOAD_ENDPOINT +-->
+<!--                    "/" +-->
+<!--                    encodeURIComponent(messageId),-->
+<!--                    {-->
+<!--                        headers:-->
+<!--                            authHeaders()-->
+<!--                    }-->
+<!--                );-->
+
+<!--            if (!response.ok) {-->
+
+<!--                throw new Error(-->
+<!--                    "File fetch failed (" +-->
+<!--                    response.status +-->
+<!--                    ")"-->
+<!--                );-->
+<!--            }-->
+
+<!--            const blob =-->
+<!--                await response.blob();-->
+
+<!--            const url =-->
+<!--                URL.createObjectURL(blob);-->
+
+<!--            fileBlobCache.set(-->
+<!--                messageId,-->
+<!--                url-->
+<!--            );-->
+
+<!--            return url;-->
+<!--        }-->
+
+
+<!--        function loadFileAndRerender(messageId) {-->
+
+<!--            if (fileLoadInFlight.has(messageId)) {-->
+<!--                return;-->
+<!--            }-->
+
+<!--            fileLoadInFlight.add(messageId);-->
+
+<!--            getFileBlobUrl(messageId)-->
+<!--                .catch(function (error) {-->
+
+<!--                    debug(-->
+<!--                        "File load failed: " +-->
+<!--                        error.message,-->
+<!--                        true-->
+<!--                    );-->
+<!--                })-->
+<!--                .finally(function () {-->
+
+<!--                    fileLoadInFlight.delete(-->
+<!--                        messageId-->
+<!--                    );-->
+
+<!--                    if (activeConversationId) {-->
+<!--                        renderMessages();-->
+<!--                    }-->
+<!--                });-->
+<!--        }-->
+
+
+<!--        function buildFileBubbleContent(message) {-->
+
+<!--            const container =-->
+<!--                document.createElement("div");-->
+
+<!--            container.className =-->
+<!--                "file-content";-->
+
+<!--            const cachedUrl =-->
+<!--                fileBlobCache.get(message.id);-->
+
+<!--            if (cachedUrl) {-->
+
+<!--                renderFileMedia(-->
+<!--                    container,-->
+<!--                    message,-->
+<!--                    cachedUrl-->
+<!--                );-->
+
+<!--            } else {-->
+
+<!--                const loading =-->
+<!--                    document.createElement("div");-->
+
+<!--                loading.className =-->
+<!--                    "file-loading";-->
+
+<!--                loading.textContent =-->
+<!--                    "Loading attachment...";-->
+
+<!--                container.appendChild(-->
+<!--                    loading-->
+<!--                );-->
+
+<!--                if (message.id) {-->
+
+<!--                    loadFileAndRerender(-->
+<!--                        message.id-->
+<!--                    );-->
+<!--                }-->
+<!--            }-->
+
+<!--            return container;-->
+<!--        }-->
+
+
+<!--        function renderFileMedia(-->
+<!--            container,-->
+<!--            message,-->
+<!--            url-->
+<!--        ) {-->
+
+<!--            const fileType =-->
+<!--                message.fileType || "";-->
+
+<!--            if (fileType.startsWith("image/")) {-->
+
+<!--                const img =-->
+<!--                    document.createElement("img");-->
+
+<!--                img.src = url;-->
+<!--                img.alt = message.fileName || "image";-->
+
+<!--                container.appendChild(img);-->
+
+<!--            } else if (fileType.startsWith("video/")) {-->
+
+<!--                const video =-->
+<!--                    document.createElement("video");-->
+
+<!--                video.src = url;-->
+<!--                video.controls = true;-->
+
+<!--                container.appendChild(video);-->
+
+<!--            } else {-->
+
+<!--                const link =-->
+<!--                    document.createElement("a");-->
+
+<!--                link.className =-->
+<!--                    "file-attachment";-->
+
+<!--                link.href = url;-->
+
+<!--                link.download =-->
+<!--                    message.fileName || "download";-->
+
+<!--                link.target = "_blank";-->
+
+<!--                const icon =-->
+<!--                    document.createElement("span");-->
+
+<!--                icon.className = "icon";-->
+
+<!--                icon.textContent = "\u{1F4CE}";-->
+
+
+<!--                const info =-->
+<!--                    document.createElement("div");-->
+
+<!--                info.className = "info";-->
+
+
+<!--                const filename =-->
+<!--                    document.createElement("div");-->
+
+<!--                filename.className = "filename";-->
+
+<!--                filename.textContent =-->
+<!--                    message.fileName || "file";-->
+
+
+<!--                const filesize =-->
+<!--                    document.createElement("div");-->
+
+<!--                filesize.className = "filesize";-->
+
+<!--                filesize.textContent =-->
+<!--                    formatFileSize(-->
+<!--                        message.fileSize || 0-->
+<!--                    ) +-->
+<!--                    " \u00B7 Download";-->
+
+
+<!--                info.appendChild(filename);-->
+<!--                info.appendChild(filesize);-->
+
+<!--                link.appendChild(icon);-->
+<!--                link.appendChild(info);-->
+
+<!--                container.appendChild(link);-->
+<!--            }-->
+<!--        }-->
+
+
+<!--        function formatFileSize(bytes) {-->
+
+<!--            if (!bytes || bytes <= 0) {-->
+<!--                return "0 B";-->
+<!--            }-->
+
+<!--            const units =-->
+<!--                ["B", "KB", "MB", "GB"];-->
+
+<!--            let size = bytes;-->
+<!--            let unitIndex = 0;-->
+
+<!--            while (-->
+<!--                size >= 1024 &&-->
+<!--                unitIndex < units.length - 1-->
+<!--                ) {-->
+
+<!--                size = size / 1024;-->
+<!--                unitIndex++;-->
+<!--            }-->
+
+<!--            return (-->
+<!--                (-->
+<!--                    unitIndex === 0-->
+<!--                        ? size-->
+<!--                        : size.toFixed(1)-->
+<!--                ) +-->
+<!--                " " +-->
+<!--                units[unitIndex]-->
+<!--            );-->
+<!--        }-->
+
+
+<!--        /* =========================================================-->
+<!--           SEND MESSAGE-->
+<!--        ========================================================= */-->
+
+<!--        sendBtn.addEventListener(-->
+<!--            "click",-->
+<!--            sendMessage-->
+<!--        );-->
+
+
+<!--        messageInput.addEventListener(-->
+<!--            "keydown",-->
+<!--            function (event) {-->
+
+<!--                if (event.key === "Enter") {-->
+
+<!--                    event.preventDefault();-->
+
+<!--                    sendMessage();-->
+<!--                }-->
+<!--            }-->
+<!--        );-->
+
+
+<!--        function sendMessage() {-->
+
+<!--            if (selectedFile) {-->
+
+<!--                sendFileMessage();-->
+
+<!--                return;-->
+<!--            }-->
+
+
+<!--            const content =-->
+<!--                messageInput.value.trim();-->
+
+
+<!--            if (!content) {-->
+<!--                return;-->
+<!--            }-->
+
+
+<!--            if (!activeConversationId) {-->
+
+<!--                debug(-->
+<!--                    "No conversation selected.",-->
+<!--                    true-->
+<!--                );-->
+
+<!--                return;-->
+<!--            }-->
+
+
+<!--            if (-->
+<!--                !isConnected ||-->
+<!--                !stompClient-->
+<!--            ) {-->
+
+<!--                debug(-->
+<!--                    "Not connected to chat server.",-->
+<!--                    true-->
+<!--                );-->
+
+<!--                return;-->
+<!--            }-->
+
+
+<!--            const conversation =-->
+<!--                conversations.get(-->
+<!--                    activeConversationId-->
+<!--                );-->
+
+
+<!--            if (!conversation) {-->
+
+<!--                debug(-->
+<!--                    "Conversation not found.",-->
+<!--                    true-->
+<!--                );-->
+
+<!--                return;-->
+<!--            }-->
+
+
+<!--            const now =-->
+<!--                new Date().toISOString();-->
+
+
+<!--            /*-->
+<!--             * Optimistic UI:-->
+<!--             *-->
+<!--             * Show the message immediately.-->
+<!--             *-->
+<!--             * Backend later sends SENT with-->
+<!--             * the real database message id via-->
+<!--             * /user/queue/message-status.-->
+<!--             */-->
+
+<!--            const outgoingReply =-->
+<!--                replyingTo;-->
+
+
+<!--            conversation.messages.push({-->
+
+<!--                id:-->
+<!--                    null,-->
+
+<!--                senderUsername:-->
+<!--                currentUsername,-->
+
+<!--                content:-->
+<!--                content,-->
+
+<!--                createdAt:-->
+<!--                now,-->
+
+<!--                status:-->
+<!--                    "SENT",-->
+
+<!--                statusUpdatedAt:-->
+<!--                now,-->
+
+<!--                pending:-->
+<!--                    true,-->
+
+<!--                messageType:-->
+<!--                    "TEXT",-->
+
+<!--                replyToMessageId:-->
+<!--                    outgoingReply-->
+<!--                        ? outgoingReply.messageId-->
+<!--                        : null,-->
+
+<!--                replyToSenderUserName:-->
+<!--                    outgoingReply-->
+<!--                        ? outgoingReply.senderUsername-->
+<!--                        : null,-->
+
+<!--                replyToContent:-->
+<!--                    outgoingReply-->
+<!--                        ? outgoingReply.content-->
+<!--                        : null,-->
+
+<!--                replyToMessageType:-->
+<!--                    outgoingReply-->
+<!--                        ? outgoingReply.messageType-->
+<!--                        : null,-->
+
+<!--                replyToFileName:-->
+<!--                    outgoingReply-->
+<!--                        ? outgoingReply.fileName-->
+<!--                        : null-->
+<!--            });-->
+
+
+<!--            renderMessages();-->
+<!--            renderConversationList();-->
+
+
+<!--            /*-->
+<!--             * Actual WebSocket send. Body shape must match-->
+<!--             * ChatMessageDTO: { conversationId, content,-->
+<!--             * replyToMessageId }. replyToMessageId is omitted-->
+<!--             * when not replying to anything.-->
+<!--             */-->
+
+<!--            const outgoingPayload = {-->
+
+<!--                conversationId:-->
+<!--                activeConversationId,-->
+
+<!--                content:-->
+<!--                content,-->
+
+<!--                messageType: "TEXT"-->
+
+<!--            };-->
+
+<!--            if (outgoingReply) {-->
+
+<!--                outgoingPayload.replyToMessageId =-->
+<!--                    outgoingReply.messageId;-->
+<!--            }-->
+
+<!--            stompClient.publish({-->
+
+<!--                destination:-->
+<!--                CHAT_SEND_DESTINATION,-->
+
+<!--                body:-->
+<!--                    JSON.stringify(-->
+<!--                        outgoingPayload-->
+<!--                    )-->
+<!--            });-->
+
+
+<!--            messageInput.value =-->
+<!--                "";-->
+
+<!--            messageInput.focus();-->
+
+<!--            clearReplyingTo();-->
+
+
+<!--            debug(-->
+<!--                "Message sent to " +-->
+<!--                CHAT_SEND_DESTINATION +-->
+<!--                " for conversation " +-->
+<!--                activeConversationId-->
+<!--            );-->
+<!--        }-->
+
+
+<!--        /* =========================================================-->
+<!--           RESTORE SESSION-->
+<!--        ========================================================= */-->
+
+<!--        if (-->
+<!--            accessToken &&-->
+<!--            currentUsername-->
+<!--        ) {-->
+
+<!--            debug(-->
+<!--                "Restored session from localStorage."-->
+<!--            );-->
+
+<!--            showApp();-->
+
+<!--        } else {-->
+
+<!--            showLogin();-->
+<!--        }-->
+
+<!--    })();-->
+<!--</script>-->
+
+<!--</body>-->
+<!--</html>-->

@@ -1,0 +1,24 @@
+.empty-conv {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  text-align: center;
+  padding: 20px;
+}
+
+.empty-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 18px;
+  color: var(--ink);
+  margin: 4px 0 0;
+}
+
+.empty-sub {
+  font-size: 13.5px;
+  color: var(--ink-soft);
+  margin: 0;
+}

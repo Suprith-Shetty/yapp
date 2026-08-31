@@ -1,0 +1,236 @@
+.picker-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  color: var(--ink-faint);
+  margin-bottom: 12px;
+}
+.picker-search input {
+  border: none;
+  background: none;
+  outline: none;
+  font-size: 13.5px;
+  color: var(--ink);
+  width: 100%;
+}
+.picker-search input::placeholder {
+  color: var(--ink-faint);
+}
+
+.picker-hint {
+  font-size: 12.5px;
+  color: var(--ink-faint);
+  text-align: center;
+  padding: 10px 0;
+  margin: 0;
+}
+
+.picker-error {
+  font-size: 12.5px;
+  color: var(--danger);
+  margin: 8px 0 0;
+}
+
+.picker-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.picker-row {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  width: 100%;
+  border: none;
+  background: none;
+  padding: 8px;
+  border-radius: var(--r-sm);
+  text-align: left;
+  transition: background 0.12s ease;
+}
+.picker-row:hover {
+  background: var(--surface-hover);
+}
+.picker-row.selected {
+  background: var(--accent-soft-2);
+}
+.picker-row:disabled {
+  opacity: 0.6;
+}
+
+.picker-avatar-wrap {
+  position: relative;
+  flex: none;
+}
+.picker-avatar-wrap img {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+}
+.picker-presence {
+  position: absolute;
+  bottom: -1px;
+  right: -1px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--green);
+  border: 2px solid var(--bg-elevated);
+}
+
+.picker-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.picker-name {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.picker-username {
+  font-size: 11.5px;
+  color: var(--ink-faint);
+}
+
+.picker-loading {
+  font-size: 11.5px;
+  color: var(--accent-ink);
+  flex: none;
+}
+
+.picker-chat-action {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex: none;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--ink-faint);
+  padding: 5px 9px;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--border);
+  opacity: 0;
+  transition: opacity 0.12s ease, background 0.12s ease, color 0.12s ease, border-color 0.12s ease;
+}
+.picker-row:hover .picker-chat-action {
+  opacity: 1;
+  background: var(--accent-soft-2);
+  color: var(--accent-ink);
+  border-color: var(--accent-soft);
+}
+
+.picker-checkbox {
+  width: 20px;
+  height: 20px;
+  border-radius: 5px;
+  border: 1.5px solid var(--border-strong);
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  color: #fff;
+}
+.picker-checkbox.checked {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.selected-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+.selected-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--accent-soft-2);
+  color: var(--accent-ink);
+  border: 1px solid var(--accent-soft);
+  border-radius: 999px;
+  padding: 4px 6px 4px 10px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.selected-chip button {
+  border: none;
+  background: none;
+  color: var(--accent-ink);
+  font-size: 10px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.selected-chip button:hover {
+  background: var(--accent-soft);
+}
+
+.group-name-input {
+  width: 100%;
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  border-radius: var(--r-sm);
+  padding: 11px 13px;
+  font-size: 15px;
+  color: var(--ink);
+  outline: none;
+}
+.group-name-input:focus {
+  border-color: var(--accent);
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: var(--r-sm);
+  padding: 9px 16px;
+  font-size: 13.5px;
+  font-weight: 700;
+}
+.btn-primary:hover:not(:disabled) {
+  background: var(--accent-hover);
+}
+.btn-primary:disabled {
+  opacity: 0.5;
+}
+
+.btn-ghost {
+  background: none;
+  border: 1px solid var(--border-strong);
+  color: var(--ink-soft);
+  border-radius: var(--r-sm);
+  padding: 9px 16px;
+  font-size: 13.5px;
+  font-weight: 600;
+}
+.btn-ghost:hover {
+  background: var(--surface-hover);
+}
+
+.btn-danger {
+  background: none;
+  border: 1px solid rgba(242, 63, 66, 0.4);
+  color: var(--danger);
+  border-radius: var(--r-sm);
+  padding: 9px 16px;
+  font-size: 13.5px;
+  font-weight: 600;
+}
+.btn-danger:hover {
+  background: rgba(242, 63, 66, 0.1);
+}

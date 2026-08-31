@@ -15,7 +15,6 @@ public class CustomUserDetails implements UserDetails
 
     private final UUID userId;
     private final String username;
-    private final String email;
     private final String password;
     private final String displayName;
     private final Collection<? extends GrantedAuthority> authorities;
@@ -24,7 +23,6 @@ public class CustomUserDetails implements UserDetails
     public CustomUserDetails(User user) {
         this.userId = user.getId();
         this.username = user.getUserName();
-        this.email = user.getEmail();
         this.password = user.getPasswordHash();
         this.displayName = user.getDisplayName();
         this.authorities = List.of(
@@ -58,11 +56,6 @@ public class CustomUserDetails implements UserDetails
         return password;
     }
 
-
-
-    public String getEmail() {
-        return email;
-    }
 
     public String getUsername() {
         return username;

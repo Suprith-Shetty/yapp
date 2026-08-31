@@ -1,0 +1,72 @@
+.splash-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-deepest);
+  overflow: hidden;
+  transition: opacity 0.5s ease;
+}
+
+.splash-screen.leaving {
+  opacity: 0;
+}
+
+.splash-mark {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  opacity: 0;
+  transform: scale(0.72) translateY(14px);
+  animation: mark-pop 0.55s cubic-bezier(0.2, 0.9, 0.3, 1.2) forwards;
+}
+
+@keyframes mark-pop {
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.splash-wordmark {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(40px, 9vw, 60px);
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+
+.splash-caption {
+  margin-top: 22px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  color: var(--ink-faint);
+  opacity: 0;
+  animation: caption-in 0.4s ease forwards;
+  animation-delay: 0.65s;
+}
+
+@keyframes caption-in {
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .splash-mark {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .splash-mark {
+    flex-direction: column;
+    gap: 10px;
+  }
+}

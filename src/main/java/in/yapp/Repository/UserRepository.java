@@ -6,16 +6,17 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface UserRepository extends JpaRepository<User, UUID>
-{
+public interface UserRepository extends JpaRepository<User, UUID> {
 
     boolean existsByUserName(String username);
 
-    boolean existsByEmail(String email);
 
+    Optional<User> findByUserName(String userName);
 
-    @Query("SELECT u FROM users u WHERE u.userName = :identifier OR u.email = :identifier")
-    Optional<User> findByUserNameOrEmail(@Param("identifier") String identifier);}
+    List<User> findByUserNameContainingIgnoreCase(String username);
+
+}

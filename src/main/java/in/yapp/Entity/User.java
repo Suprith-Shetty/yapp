@@ -20,8 +20,8 @@ public class User
     @Column(nullable = false, unique = true)
     private String userName;
 
-    @Column(nullable = false, unique = true)
-    private String email;
+//    @Column(nullable = false, unique = true)
+//    private String email;
 
     @Column(nullable = false)
     private String passwordHash;
@@ -44,7 +44,18 @@ public class User
 
     @UpdateTimestamp
     @Column(nullable = false)
+
+
+
     private Instant updatedAt;
+
+    @Column(nullable = false)
+    private boolean online;
+
+    private Instant lastSeen;
+
+    @Column(length = 500)
+    private String profilePictureUrl;
 
 
 

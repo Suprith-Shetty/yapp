@@ -37,3 +37,10 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# Frontend dependencies
+node_modules/
+dist/
+
+# Logs
+*.log
