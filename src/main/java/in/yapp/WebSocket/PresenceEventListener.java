@@ -17,24 +17,35 @@ public class PresenceEventListener {
 
     private final PresenceService presenceService;
 
+
     @EventListener
     public void handleConnect(SessionConnectedEvent event) {
+
         StompHeaderAccessor accessor =
                 StompHeaderAccessor.wrap(event.getMessage());
 
         Principal principal = accessor.getUser();
 
         if (principal == null) {
+            return;
+        }
+
+        String sessionId = accessor.getSessionId();
+
+        if (sessionId == null) {
             return;
         }
 
         presenceService.userOnline(
-                UUID.fromString(principal.getName())
+                UUID.fromString(principal.getName()),
+                sessionId
         );
     }
 
+
     @EventListener
     public void handleDisconnect(SessionDisconnectEvent event) {
+
         StompHeaderAccessor accessor =
                 StompHeaderAccessor.wrap(event.getMessage());
 
@@ -44,8 +55,15 @@ public class PresenceEventListener {
             return;
         }
 
+        String sessionId = accessor.getSessionId();
+
+        if (sessionId == null) {
+            return;
+        }
+
         presenceService.userOffline(
-                UUID.fromString(principal.getName())
+                UUID.fromString(principal.getName()),
+                sessionId
         );
     }
 }

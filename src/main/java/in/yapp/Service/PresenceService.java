@@ -8,7 +8,9 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -18,7 +20,25 @@ public class PresenceService {
     private final UserRepository userRepository;
     private final SimpMessagingTemplate messagingTemplate;
 
-    public void userOnline(UUID userId) {
+    private final Map<UUID, Set<String>> activeSessions = new HashMap<>();
+
+
+    public synchronized void userOnline(UUID userId, String sessionId) {
+
+        Set<String> sessions =
+                activeSessions.computeIfAbsent(
+                        userId,
+                        ignored -> new HashSet<>()
+                );
+
+
+        boolean wasOffline = sessions.isEmpty();
+
+        sessions.add(sessionId);
+
+        if (!wasOffline) {
+            return;
+        }
 
         User user = userRepository.findById(userId)
                 .orElseThrow();
@@ -26,19 +46,27 @@ public class PresenceService {
         user.setOnline(true);
         userRepository.save(user);
 
-        Map<String, Object> event = new HashMap<>();
-        event.put("userId", user.getId());
-        event.put("username", user.getUserName());
-        event.put("online", true);
-        event.put("lastSeen", user.getLastSeen());
-
-        messagingTemplate.convertAndSend(
-                "/topic/presence",
-                (Object) event
-        );
+        broadcastPresence(user, true, user.getLastSeen());
     }
 
-    public void userOffline(UUID userId) {
+
+    public synchronized void userOffline(UUID userId, String sessionId) {
+
+        Set<String> sessions = activeSessions.get(userId);
+
+        if (sessions == null) {
+            return;
+        }
+
+        sessions.remove(sessionId);
+
+
+        if (!sessions.isEmpty()) {
+            return;
+        }
+
+
+        activeSessions.remove(userId);
 
         User user = userRepository.findById(userId)
                 .orElseThrow();
@@ -49,10 +77,21 @@ public class PresenceService {
         user.setLastSeen(lastSeen);
         userRepository.save(user);
 
+        broadcastPresence(user, false, lastSeen);
+    }
+
+
+    private void broadcastPresence(
+            User user,
+            boolean online,
+            Instant lastSeen
+    ) {
+
         Map<String, Object> event = new HashMap<>();
+
         event.put("userId", user.getId());
         event.put("username", user.getUserName());
-        event.put("online", false);
+        event.put("online", online);
         event.put("lastSeen", lastSeen);
 
         messagingTemplate.convertAndSend(

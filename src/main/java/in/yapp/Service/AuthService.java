@@ -130,7 +130,7 @@ public class AuthService {
     {
         UsernamePasswordAuthenticationToken authenticationToken =
                 new UsernamePasswordAuthenticationToken(
-                        request.getUsername(),
+                        request.getUsername().toLowerCase(Locale.ROOT),
                         request.getPassword()
                 );
 
