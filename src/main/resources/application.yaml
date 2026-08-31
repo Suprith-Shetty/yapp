@@ -19,7 +19,9 @@ spring:
 
     show-sql: false
 
-
+server:
+  port: ${PORT:8080}
+  address: 0.0.0.0
 
 jwt:
   secret: ${JWT_SECRET}
