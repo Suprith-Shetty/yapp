@@ -151,10 +151,16 @@ in.yapp
 
 ## Author
 
-Hey, I'm Suprith 👋 Focused on AI/ML and backend development, and always open to collaborate on interesting projects.
+<div align="center">
+
+<img src="https://github.com/Suprith-Shetty.png" width="120" alt="Suprith Shetty"/>
+
+### Hey, I'm Suprith 👋
+
+Focused on **AI/ML** and **backend development** — open to collaborate.
 
 **Suprith Shetty**
 
-[![GitHub](https://img.shields.io/badge/GitHub-Suprith--Shetty-181717?style=flat&logo=github&logoColor=white)](https://github.com/Suprith-Shetty)
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-Suprith%20Shetty-0A66C2?style=flat&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/suprith-shetty-991109379/)
-[![Gmail](https://img.shields.io/badge/Gmail-shettysuprith04%40gmail.com-D14836?style=flat&logo=gmail&logoColor=white)](mailto:shettysuprith04@gmail.com)
+[GitHub](https://github.com/Suprith-Shetty) · [LinkedIn](https://www.linkedin.com/in/suprith-shetty-991109379/) · [Email](mailto:shettysuprith04@gmail.com)
+
+</div>
